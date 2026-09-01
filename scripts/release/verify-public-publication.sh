@@ -13,11 +13,14 @@ gpg --verify "$manifest.asc" "$manifest" >/dev/null 2>&1 || fail "manifest signa
 mkdir -p "$work/download"
 
 implementation="$work/download/kaleido-gradle-plugin-$version.jar"
-marker="$work/download/com.tongsr.kaleido.gradle.plugin-$version.pom"
-curl -fsSL "$portal/com/tongsr/kaleido/kaleido-gradle-plugin/$version/kaleido-gradle-plugin-$version.jar" -o "$implementation"
-curl -fsSL "$portal/com/tongsr/kaleido/com.tongsr.kaleido.gradle.plugin/$version/com.tongsr.kaleido.gradle.plugin-$version.pom" -o "$marker"
+marker="$work/download/io.github.ujffdi.kaleido.gradle.plugin-$version.pom"
+curl -fsSL "$portal/io/github/ujffdi/kaleido-gradle-plugin/$version/kaleido-gradle-plugin-$version.jar" -o "$implementation"
+curl -fsSL "$portal/io/github/ujffdi/kaleido/io.github.ujffdi.kaleido.gradle.plugin/$version/io.github.ujffdi.kaleido.gradle.plugin-$version.pom" -o "$marker"
 expected_candidate="$(awk -F= '$1=="asset.0.sha256" {print $2}' "$manifest")"
-expected_marker="$(awk -F= '$1=="asset.2.sha256" {print $2}' "$manifest")"
+marker_path="kaleido-gradle-plugin/build/publications/kaleidoPluginMarkerMaven/pom-default.xml"
+expected_marker="$(awk -F= -v path="$marker_path" \
+  '$1 ~ /^asset[.][0-9]+[.]path$/ && $2==path {getline; print $2; exit}' "$manifest")"
+[[ -n "$expected_candidate" && -n "$expected_marker" ]] || fail "public artifact digests are absent"
 [[ "$(shasum -a 256 "$implementation" | awk '{print $1}')" == "$expected_candidate" ]] || fail "public plugin digest mismatch"
 [[ "$(shasum -a 256 "$marker" | awk '{print $1}')" == "$expected_marker" ]] || fail "public marker digest mismatch"
 
@@ -25,25 +28,22 @@ consumer="$work/consumer"
 rm -rf "$consumer"
 mkdir -p "$consumer"
 cp -R "$repo_root/samples/kaleido-sample/." "$consumer/"
-python3 - "$consumer/settings.gradle.kts" <<'PY'
-import pathlib, re, sys
-p = pathlib.Path(sys.argv[1])
-s = p.read_text()
-s = re.sub(r'maven \{ url = uri\(providers\.gradleProperty\("matrixPluginRepository"\)\.get\(\)\) \}\n\s*', '', s)
-p.write_text(s)
-PY
 
 test_store="$work/post-publication-test.p12"
 password="kaleido-post-publication-test"
-keytool -genkeypair -alias upload -keyalg RSA -keysize 2048 -validity 7 \
-  -dname "CN=Kaleido Post Publication Test" -storetype PKCS12 -keystore "$test_store" \
-  -storepass "$password" -keypass "$password" >/dev/null 2>&1
+if [[ ! -f "$test_store" ]]; then
+  keytool -genkeypair -alias upload -keyalg RSA -keysize 2048 -validity 7 \
+    -dname "CN=Kaleido Post Publication Test" -storetype PKCS12 -keystore "$test_store" \
+    -storepass "$password" -keypass "$password" >/dev/null 2>&1
+fi
 certificate="$({ keytool -exportcert -alias upload -keystore "$test_store" -storepass "$password" -rfc 2>/dev/null \
   | openssl x509 -outform der 2>/dev/null | shasum -a 256; } | awk '{print $1}')"
 export KALEIDO_UPLOAD_KEYSTORE="$test_store" KALEIDO_UPLOAD_STORE_PASSWORD="$password"
 export KALEIDO_UPLOAD_KEY_ALIAS=upload KALEIDO_UPLOAD_KEY_PASSWORD="$password"
 export KALEIDO_UPLOAD_CERTIFICATE_SHA256="$certificate"
-gradle -p "$consumer" clean bundleRelease -PmatrixAgp=9.2.1 -PmatrixKaleido="$version"
+"$repo_root/gradlew" -p "$consumer" clean \
+  :baseline:bundleRelease :app:bundleRelease \
+  -PsampleAgpVersion=9.2.0 -PsampleKaleidoVersion="$version"
 aab="$consumer/app/build/outputs/bundle/release/app-release.aab"
 "$repo_root/gradlew" -q :release-gates:installDist
 [[ -f "$aab" ]] || fail "public marker Consumer AAB is missing"
@@ -73,7 +73,7 @@ $adb -s "$serial" uninstall "$package_name" >/dev/null || true
 cat > "$work/post-publication-record.properties" <<EOF
 schema=KaleidoPostPublication.v1
 candidate.sha256=$expected_candidate
-coordinates=com.tongsr.kaleido:$version
+coordinates=io.github.ujffdi.kaleido:$version
 publicPluginDigest=PASS
 publicMarkerDigest=PASS
 cleanMarkerResolution=PASS

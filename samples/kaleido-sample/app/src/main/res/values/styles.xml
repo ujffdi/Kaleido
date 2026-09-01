@@ -1,3 +1,17 @@
 <resources>
-    <style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar" />
+    <style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:navigationBarColor">@color/probe_surface</item>
+        <item name="android:statusBarColor">@color/probe_surface</item>
+        <item name="android:windowActionModeOverlay">true</item>
+    </style>
+
+    <style name="ProbeIcon">
+        <item name="android:layout_width">@dimen/probe_icon_size</item>
+        <item name="android:layout_height">@dimen/probe_icon_size</item>
+        <item name="android:layout_margin">@dimen/probe_icon_margin</item>
+        <item name="android:background">@drawable/probe_icon_background</item>
+        <item name="android:padding">@dimen/probe_spacing_small</item>
+        <item name="android:scaleType">fitCenter</item>
+    </style>
 </resources>

@@ -1,0 +1,9 @@
+<resources>
+    <color name="probe_surface">#FF151A23</color>
+    <color name="probe_panel">#FF202735</color>
+    <color name="probe_panel_border">#FF3D4758</color>
+    <color name="probe_text">#FFF4F6F8</color>
+    <color name="probe_text_secondary">#FFBAC3D1</color>
+    <color name="probe_icon_tint">#FFDCE7F5</color>
+    <color name="probe_mode_marker">#FF4DA3FF</color>
+</resources>

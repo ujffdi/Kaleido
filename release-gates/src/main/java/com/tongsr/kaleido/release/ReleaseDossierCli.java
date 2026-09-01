@@ -28,7 +28,11 @@ public final class ReleaseDossierCli {
         var options = parse(arguments);
         var output = Path.of(single(options, "output"));
         var manifest = Path.of(single(options, "manifest"));
+        var manifestSignature = Path.of(single(options, "manifest-signature"));
         if (!Files.isRegularFile(manifest)) throw failure("release manifest is missing");
+        if (!Files.isRegularFile(manifestSignature)) {
+            throw failure("release manifest signature is missing");
+        }
         if (!"true".equals(single(options, "manifest-signature-verified"))) {
             throw failure("release manifest signature is not verified");
         }
@@ -43,9 +47,11 @@ public final class ReleaseDossierCli {
             throw failure("mandatory records mismatch; missing=" + missing);
         }
 
-        var text = new StringBuilder("schema=KaleidoReleaseDossier.v1\n")
+        var text = new StringBuilder("schema=KaleidoPrePublicationDossier.v1\n")
                 .append("candidate.sha256=").append(candidate).append('\n')
                 .append("releaseManifest.sha256=").append(digest(manifest)).append('\n')
+                .append("releaseManifest.signature.sha256=")
+                .append(digest(manifestSignature)).append('\n')
                 .append("releaseManifest.signatureVerified=true\n")
                 .append("failurePolicy.product=new-versioned-candidate\n")
                 .append("failurePolicy.infrastructure=same-bytes-classified-rerun\n")
@@ -56,18 +62,20 @@ public final class ReleaseDossierCli {
             var entry = ordered.get(index);
             var values = load(entry.getValue());
             exact(values, "verdict", "PASS");
-            var bound = values.getProperty("candidate.sha256");
-            if (bound != null && !candidate.equals(bound.trim())) {
-                throw failure("record candidate mismatch: " + entry.getKey());
-            }
+            exact(values, "candidate.sha256", candidate);
             text.append("record.").append(index).append(".name=").append(entry.getKey()).append('\n')
                     .append("record.").append(index).append(".sha256=")
                     .append(digest(entry.getValue())).append('\n');
         }
 
         var approvals = files(options.get("approval"), "approval");
+        var approvalSignatures = files(options.get("approval-signature"), "approval signature");
         if (approvals.size() != 2) throw failure("exactly two approvals are required");
+        if (approvalSignatures.size() != approvals.size()) {
+            throw failure("each approval requires one verified detached signature");
+        }
         var reviewers = new LinkedHashSet<String>();
+        var signerFingerprints = new LinkedHashSet<String>();
         var roles = new LinkedHashSet<String>();
         for (int index = 0; index < approvals.size(); index++) {
             var approval = load(approvals.get(index));
@@ -76,12 +84,23 @@ public final class ReleaseDossierCli {
             exact(approval, "signatureVerified", "true");
             var reviewer = require(approval, "reviewer.id");
             var role = require(approval, "role");
+            var fingerprint = require(approval, "signer.fingerprint").toUpperCase(java.util.Locale.ROOT);
+            if (!fingerprint.matches("[0-9A-F]{40}|[0-9A-F]{64}")) {
+                throw failure("approval signer fingerprint is invalid");
+            }
             if (!reviewers.add(reviewer)) throw failure("approval reviewers must be independent");
+            if (!signerFingerprints.add(fingerprint)) {
+                throw failure("approval signing keys must be independent");
+            }
             roles.add(role);
             text.append("approval.").append(index).append(".reviewer=").append(reviewer).append('\n')
                     .append("approval.").append(index).append(".role=").append(role).append('\n')
+                    .append("approval.").append(index).append(".signerFingerprint=")
+                    .append(fingerprint).append('\n')
                     .append("approval.").append(index).append(".sha256=")
-                    .append(digest(approvals.get(index))).append('\n');
+                    .append(digest(approvals.get(index))).append('\n')
+                    .append("approval.").append(index).append(".signature.sha256=")
+                    .append(digest(approvalSignatures.get(index))).append('\n');
         }
         if (!roles.containsAll(Set.of("release-owner", "provenance-security-reviewer"))) {
             throw failure("release-owner and provenance-security-reviewer approvals are required");

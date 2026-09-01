@@ -2,16 +2,18 @@
 
 ## Preconditions and topology
 
-Apply `com.android.application` before `com.tongsr.kaleido`. The MVP supports one
+Apply `com.android.application` before `io.github.ujffdi.kaleido`. The MVP supports one
 base application module, one minified `release` build type, no dynamic-feature,
 asset-pack, AI-pack, test-only, library, or KMP target, and no other final-AAB
 transform owner. Unsupported topology fails before output publication.
 
-The complete Safe example is [`samples/kaleido-sample`](../../samples/kaleido-sample).
-The complete Full plus Compose example is
-[`release/fixtures/full-compose`](../../release/fixtures/full-compose). These are
-the canonical DSL examples and are compiled against the packaged plugin marker
-by `scripts/release/validate-public-docs.sh` and both Compatibility Matrix rows.
+The single comprehensive Sample App is
+[`samples/kaleido-sample`](../../samples/kaleido-sample). Its shared `baseline` and
+`app` modules provide ordinary and Full-plus-Compose AABs from the same Consumer
+source tree. It is compiled against the packaged plugin marker by
+`scripts/release/validate-public-docs.sh` and both Compatibility Matrix rows. Minimal
+Safe, Full Compose, and native projects remain under `release/fixtures` as
+machine-facing acceptance inputs, not developer examples.
 
 ## Safe Defaults v1
 

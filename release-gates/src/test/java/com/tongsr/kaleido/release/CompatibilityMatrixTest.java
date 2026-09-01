@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import org.junit.Test;
 
 public final class CompatibilityMatrixTest {
@@ -17,7 +18,7 @@ public final class CompatibilityMatrixTest {
     @Test
     public void mandatoryRowsAreExactAndImmutable() {
         assertEquals(new CompatibilityMatrix.Row(
-                "A3", "9.2.1", "9.4.1", "linux", "x86_64",
+                "A3", "9.2.0", "9.4.1", "linux", "x86_64",
                 17, "36.0.0", 36, "built-in"),
                 CompatibilityMatrix.requireRow("A3"));
         assertEquals(new CompatibilityMatrix.Row(
@@ -26,6 +27,17 @@ public final class CompatibilityMatrixTest {
                 CompatibilityMatrix.requireRow("A4"));
         assertThrows(UnsupportedOperationException.class,
                 () -> CompatibilityMatrix.mandatoryRows().clear());
+    }
+
+    @Test
+    public void mandatoryFixtureClosureIncludesTheComprehensiveSample() {
+        assertEquals(Set.of(
+                "exhaustive-boundary",
+                "full-compose",
+                "java-safe",
+                "kotlin-safe",
+                "sample-comprehensive",
+                "sana-reference"), CompatibilityMatrix.requiredFixtures());
     }
 
     @Test
@@ -39,7 +51,7 @@ public final class CompatibilityMatrixTest {
         assertArrayEquals(first, second);
         var text = new String(first, StandardCharsets.UTF_8);
         assertTrue(text.startsWith("schema=KaleidoCompatibilityMatrix.v1\n"));
-        assertTrue(text.contains("row.agp=9.2.1\n"));
+        assertTrue(text.contains("row.agp=9.2.0\n"));
         assertTrue(text.contains("row.os=linux\nrow.arch=x86_64\n"));
         assertTrue(text.endsWith("verdict=PASS\n"));
     }

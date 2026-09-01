@@ -24,6 +24,15 @@ tasks.test {
 }
 
 val pluginRuntime = project(":kaleido-gradle-plugin").configurations.named("runtimeClasspath")
+val pluginProject = project(":kaleido-gradle-plugin")
+val pluginVersion = providers.provider { pluginProject.version.toString() }
+val pluginJar = pluginProject.tasks.named<Jar>("jar").flatMap { it.archiveFile }
+val pluginSourcesJar = pluginProject.tasks.named<Jar>("sourcesJar").flatMap { it.archiveFile }
+val pluginMarkerPom = pluginProject.layout.buildDirectory.file(pluginVersion.map {
+    "functional-test-repository/io/github/ujffdi/kaleido/" +
+        "io.github.ujffdi.kaleido.gradle.plugin/$it/" +
+        "io.github.ujffdi.kaleido.gradle.plugin-$it.pom"
+})
 
 tasks.register<JavaExec>("generateSupplyChainEvidence") {
     dependsOn(":kaleido-gradle-plugin:jar", ":kaleido-gradle-plugin:sourcesJar",
@@ -31,7 +40,27 @@ tasks.register<JavaExec>("generateSupplyChainEvidence") {
     classpath = sourceSets.main.get().runtimeClasspath
     mainClass = "com.tongsr.kaleido.release.SupplyChainEvidenceCli"
     val evidenceDirectory = rootProject.layout.buildDirectory.dir("release-gates/supply-chain")
-    outputs.dir(evidenceDirectory)
+    inputs.property("pluginVersion", pluginVersion)
+    inputs.files(pluginJar, pluginSourcesJar, pluginMarkerPom)
+        .withPropertyName("candidateArtifacts")
+        .withPathSensitivity(PathSensitivity.NONE)
+    inputs.files(pluginRuntime)
+        .withPropertyName("pluginRuntimeClasspath")
+        .withPathSensitivity(PathSensitivity.NONE)
+    inputs.files(
+        rootProject.file("LICENSE"),
+        rootProject.file("NOTICE"),
+        rootProject.file("THIRD_PARTY_NOTICES.md"),
+        rootProject.file("release/provenance/upstream-components.properties"),
+        rootProject.file("gradle/verification-metadata.xml"),
+    ).withPropertyName("releaseMetadata").withPathSensitivity(PathSensitivity.RELATIVE)
+    outputs.files(
+        evidenceDirectory.map { it.file("source-dependency-inventory.properties") },
+        evidenceDirectory.map { it.file("supply-chain-manifest.properties") },
+        evidenceDirectory.zip(pluginVersion) { directory, version ->
+            directory.file("kaleido-$version.cdx.json")
+        },
+    )
     doFirst {
         val pluginVersion = project(":kaleido-gradle-plugin").version.toString()
         args = listOf(
@@ -42,9 +71,9 @@ tasks.register<JavaExec>("generateSupplyChainEvidence") {
             "--sources", rootProject.file(
                 "kaleido-gradle-plugin/build/libs/kaleido-gradle-plugin-$pluginVersion-sources.jar").absolutePath,
             "--marker", rootProject.file(
-                "kaleido-gradle-plugin/build/functional-test-repository/com/tongsr/kaleido/" +
-                    "com.tongsr.kaleido.gradle.plugin/$pluginVersion/" +
-                    "com.tongsr.kaleido.gradle.plugin-$pluginVersion.pom").absolutePath,
+                "kaleido-gradle-plugin/build/functional-test-repository/io/github/ujffdi/kaleido/" +
+                    "io.github.ujffdi.kaleido.gradle.plugin/$pluginVersion/" +
+                    "io.github.ujffdi.kaleido.gradle.plugin-$pluginVersion.pom").absolutePath,
             "--license", rootProject.file("LICENSE").absolutePath,
             "--notice", rootProject.file("NOTICE").absolutePath,
             "--third-party", rootProject.file("THIRD_PARTY_NOTICES.md").absolutePath,

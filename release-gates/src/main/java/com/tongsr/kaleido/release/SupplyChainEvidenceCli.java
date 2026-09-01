@@ -61,7 +61,7 @@ public final class SupplyChainEvidenceCli {
     static byte[] sbom(
             String version, String candidateDigest, Path sources, Path marker,
             List<Component> components) throws Exception {
-        var rootRef = "pkg:maven/com.tongsr.kaleido/kaleido-gradle-plugin@" + version;
+        var rootRef = "pkg:maven/io.github.ujffdi/kaleido-gradle-plugin@" + version;
         var serial = UUID.nameUUIDFromBytes(
                 ("kaleido-sbom:" + candidateDigest).getBytes(StandardCharsets.UTF_8));
         var json = new StringBuilder()
@@ -73,7 +73,7 @@ public final class SupplyChainEvidenceCli {
                 .append("  \"version\": 1,\n")
                 .append("  \"metadata\": {\"component\": {")
                 .append("\"type\": \"library\", \"bom-ref\": \"").append(rootRef)
-                .append("\", \"group\": \"com.tongsr.kaleido\", ")
+                .append("\", \"group\": \"io.github.ujffdi\", ")
                 .append("\"name\": \"kaleido-gradle-plugin\", \"version\": \"")
                 .append(escape(version)).append("\", \"purl\": \"").append(rootRef)
                 .append("\", \"hashes\": [{\"alg\": \"SHA-256\", \"content\": \"")

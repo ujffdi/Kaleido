@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Exemple Kaleido complet</string>
+    <string name="locale_probe">locale-fr</string>
+</resources>

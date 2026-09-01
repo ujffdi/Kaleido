@@ -1,0 +1,3 @@
+<resources>
+    <public name="public_label" type="string" />
+</resources>

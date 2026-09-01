@@ -7,12 +7,13 @@ Build Tools 36.0.0, compileSdk 36, and AGP built-in Kotlin:
 
 | Row | AGP | Gradle | Status meaning |
 | --- | --- | --- | --- |
-| A3 | 9.2.1 | 9.4.1 | Mandatory only after all six fixtures and device gates pass |
-| A4 | 9.3.2 | 9.5.0 | Mandatory only after all six fixtures and device gates pass |
+| A3 | 9.2.0 | 9.4.1 | Mandatory only after all seven compatibility inputs and device gates pass |
+| A4 | 9.3.2 | 9.5.0 | Mandatory only after all seven compatibility inputs and device gates pass |
 
-The six fixtures are Java Safe, Kotlin Safe, Full+Compose, Sample App, migrated
-Sana, and exhaustive boundary/error coverage. A row is supported only when the
-exact plugin/marker bytes pass the full Linux and controlled-device record.
+The seven compatibility inputs are the Java Safe, Kotlin Safe, and Full+Compose
+Release Fixtures; the Safe and Full+Compose Sample Apps; migrated Sana; and exhaustive
+boundary/error coverage. A row is supported only when the exact plugin/marker bytes
+pass the full Linux and controlled-device record.
 Experiments on another host or a future AGP/Gradle are nonblocking forward
 evidence, never a supported row. At present no public version is declared
 supported because the mandatory Linux/Sana records have not been produced.

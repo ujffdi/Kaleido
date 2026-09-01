@@ -10,7 +10,7 @@ configures one `kaleido {}` block, and runs its normal Release bundle task.
 
 Kaleido combines four capability families in that build:
 
-1. Generates deterministic Java/Kotlin code, resources, and optional Manifest
+1. Generates deterministic Kotlin code, resources, and optional Manifest
    contributions. The opt-in Compose Generator belongs to this capability.
 2. Rewrites eligible application class names while synchronizing supported
    Manifest and XML class references.
@@ -44,7 +44,7 @@ current support status and evidence:
 
 | Row | Android Gradle Plugin | Gradle |
 | --- | --- | --- |
-| A3 | 9.2.1 | 9.4.1 |
+| A3 | 9.2.0 | 9.4.1 |
 | A4 | 9.3.2 | 9.5.0 |
 
 Dynamic Feature, Asset Pack, AI Pack, test-only, Android library, and KMP targets
@@ -58,7 +58,7 @@ be applied.
 
 ```kotlin
 plugins {
-    id("com.android.application") version "9.2.1"
+    id("com.android.application") version "9.2.0"
     id("io.github.ujffdi.kaleido") version "0.1.0"
 }
 
@@ -95,6 +95,10 @@ No `kaleido {}` block is required. Plugin-only adoption selects `SAFE` and Safe
 Defaults v1. Provide one complete signing source, for example through protected
 environment variables:
 
+The repository's single developer-facing Sample is the comprehensive
+[`samples/kaleido-sample`](samples/kaleido-sample) project. Minimal Safe coverage
+remains in the machine-facing Release Fixtures.
+
 ```shell
 export KALEIDO_UPLOAD_KEYSTORE=/secure/path/upload.p12
 export KALEIDO_UPLOAD_STORE_PASSWORD='store-password'
@@ -122,6 +126,9 @@ Safe Defaults v1 generates:
 
 Use `FULL` only when the build needs one of the explicitly selected Full-only
 controls. This example also enables the optional Compose Generator:
+
+The executable Kotlin, XML-resource, Material 3, and baseline-comparison example is
+[`samples/kaleido-sample`](samples/kaleido-sample).
 
 ```kotlin
 kaleido {
@@ -417,7 +424,7 @@ Release AAB 进行确定性、可审计的构建加固。接入方只需应用�
 
 Kaleido 在一次构建中统一提供四类能力：
 
-1. 确定性生成 Java/Kotlin 代码、资源和可选的 Manifest 内容；需要显式启用的
+1. 确定性生成 Kotlin 代码、资源和可选的 Manifest 内容；需要显式启用的
    Compose Generator 属于这一类能力。
 2. 改写符合条件的应用类名，并同步处理受支持的 Manifest 与 XML 类引用。
 3. 在最终 AAB 中混淆和优化资源，同时保留资源 ID 以及声明保护的名称和路径。
@@ -446,7 +453,7 @@ Kaleido 只验证精确的兼容性组合，不笼统宣称支持所有 AGP 9 �
 
 | 组合 | Android Gradle Plugin | Gradle |
 | --- | --- | --- |
-| A3 | 9.2.1 | 9.4.1 |
+| A3 | 9.2.0 | 9.4.1 |
 | A4 | 9.3.2 | 9.5.0 |
 
 MVP 不支持 Dynamic Feature、Asset Pack、AI Pack、test-only、Android Library
@@ -459,7 +466,7 @@ MVP 不支持 Dynamic Feature、Asset Pack、AI Pack、test-only、Android Libra
 
 ```kotlin
 plugins {
-    id("com.android.application") version "9.2.1"
+    id("com.android.application") version "9.2.0"
     id("io.github.ujffdi.kaleido") version "0.1.0"
 }
 
@@ -495,6 +502,10 @@ pluginManagement {
 无需声明 `kaleido {}` 块。只应用插件时会使用 `SAFE` 和 Safe Defaults v1。
 通过受保护的环境变量提供一套完整签名配置即可：
 
+仓库唯一面向开发者的 Sample 是综合工程
+[`samples/kaleido-sample`](samples/kaleido-sample)。最小 Safe 覆盖仍由机器验收用的
+Release Fixture 提供。
+
 ```shell
 export KALEIDO_UPLOAD_KEYSTORE=/secure/path/upload.p12
 export KALEIDO_UPLOAD_STORE_PASSWORD='store-password'
@@ -521,6 +532,9 @@ Safe Defaults v1 会生成：
 
 只有在需要某项显式 Full-only 控制时才选择 `FULL`。下面的示例同时启用了可选的
 Compose Generator：
+
+可执行 Kotlin、XML 资源、Material 3 与 Baseline 对比示例位于
+[`samples/kaleido-sample`](samples/kaleido-sample)。
 
 ```kotlin
 kaleido {

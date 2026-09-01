@@ -1,0 +1,13 @@
+<resources>
+    <color name="probe_surface">#FFF8F3</color>
+    <color name="probe_panel">#FFFFFFFF</color>
+    <color name="probe_panel_border">#FFD7DCE3</color>
+    <color name="probe_text">#FF1F2937</color>
+    <color name="probe_text_secondary">#FF596579</color>
+    <color name="probe_icon_tint">#FF27364A</color>
+    <color name="probe_accent">#FF4F46E5</color>
+    <color name="probe_accent_pressed">#FF3730A3</color>
+    <color name="probe_status_pass">#FF18794E</color>
+    <color name="probe_status_fail">#FFB42318</color>
+    <color name="probe_mode_marker">#FFFF6B6B</color>
+</resources>

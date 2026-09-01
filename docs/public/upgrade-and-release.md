@@ -21,7 +21,10 @@ suppression flag.
 Each release candidate identity binds source revision/tag, plugin and marker,
 sources, documentation, SBOM, provenance, matrix, runtime, reproducibility,
 performance and approval records. Automated gates finish before two independent
-human approvals. Publication promotes those exact bytes to the Gradle Plugin
-Portal and a matching signed-tag GitHub Release without rebuild. Maven Central
-and Google Play are outside the MVP. A defective public version is never replaced:
-publish an advisory and gate a new patch candidate.
+human approvals. Publication submits those exact bytes to the Gradle Plugin
+Portal and creates a matching signed-tag GitHub draft without rebuild. The source
+release is finalized only after the public Portal bytes, clean marker resolution,
+Release Evidence Set, bundletool validation, and controlled-device smoke close into
+the signed final Release Dossier. Maven Central and Google Play are outside the MVP.
+A defective public version is never replaced: publish an advisory and gate a new
+patch candidate.

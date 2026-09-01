@@ -9,7 +9,7 @@ pluginManagement {
         when (requested.id.id) {
             "com.android.application" ->
                 useVersion(providers.gradleProperty("matrixAgp").get())
-            "com.tongsr.kaleido" ->
+            "io.github.ujffdi.kaleido" ->
                 useVersion(providers.gradleProperty("matrixKaleido").get())
         }
     }

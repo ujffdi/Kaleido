@@ -1,12 +1,20 @@
 # Changelog
 
-## 0.1.0-dev — unreleased candidate
+## 0.1.0 — release candidate
 
+- Implements the plugin, tests, and ordinary/Activity generators in Kotlin.
+  Safe and Full Junk Code emit `.kt` sources compiled by AGP built-in Kotlin;
+  Java-only Consumer `src/` remains supported without Kaleido applying a Kotlin
+  plugin.
 - Implements the Safe and Full deterministic Android release pipeline, optional
   Runtime-only Compose generation, typed protection and escape hatches, class and
   resource transformations, mapping composition, final-AAB signing, and atomic
   Release Evidence Sets.
 - Adds exact A3/A4 compatibility, device, reproducibility, performance,
   provenance, SBOM, documentation, and immutable-publication gates.
-- This is not a supported public release. Mandatory Linux, migrated Sana, human
-  approval, Portal, and post-publication evidence remain outstanding.
+- Adds independent Safe and Full+Compose Sample Apps as executable bilingual
+  documentation; both are inputs to the packaged-marker A3/A4 compatibility
+  workflow.
+- The version becomes supported only after the exact candidate passes the
+  mandatory Linux, migrated Sana, device, performance, approval, Portal, and
+  post-publication gates.

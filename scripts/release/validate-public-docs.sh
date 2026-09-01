@@ -1,16 +1,24 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+if [[ $# -ne 1 ]]; then
+  echo "usage: validate-public-docs.sh VERSION" >&2
+  exit 2
+fi
+
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+version="$1"
 work_root="$repo_root/build/release-gates/documentation"
 plugin_repository="$repo_root/kaleido-gradle-plugin/build/functional-test-repository"
+plugin_jar="$repo_root/kaleido-gradle-plugin/build/libs/kaleido-gradle-plugin-$version.jar"
 mkdir -p "$work_root"
 
 python3 - "$repo_root" <<'PY'
 import pathlib, re, sys
 root = pathlib.Path(sys.argv[1])
 files = [root / "README.md", root / "SECURITY.md", root / "CONTRIBUTING.md",
-         root / "CHANGELOG.md"] + sorted((root / "docs/public").glob("*.md"))
+         root / "CHANGELOG.md"] + sorted((root / "docs/public").glob("*.md")) \
+        + sorted((root / "samples").glob("**/*.md"))
 failures = []
 for source in files:
     text = source.read_text(encoding="utf-8")
@@ -38,7 +46,7 @@ PY
 
 cd "$repo_root"
 ./gradlew :kaleido-gradle-plugin:publishAllPublicationsToFunctionalTestRepository \
-  :kaleido-gradle-plugin:validatePlugins
+  :kaleido-gradle-plugin:validatePlugins -PkaleidoVersion="$version"
 
 test_store="$work_root/documentation-test-upload.p12"
 test_password="kaleido-documentation-test"
@@ -58,23 +66,63 @@ export KALEIDO_UPLOAD_KEY_ALIAS="upload"
 export KALEIDO_UPLOAD_KEY_PASSWORD="$test_password"
 export KALEIDO_UPLOAD_CERTIFICATE_SHA256="$test_certificate"
 
-for fixture in samples/kaleido-sample release/fixtures/full-compose; do
-  name="$(basename "$fixture")"
-  target="$work_root/$name"
-  rm -rf "$target"
-  mkdir -p "$target"
-  cp -R "$repo_root/$fixture/." "$target/"
-  ./gradlew -p "$target" clean bundleRelease \
-    -PmatrixPluginRepository="$plugin_repository" \
-    -PmatrixAgp=9.2.1 -PmatrixKaleido=0.1.0-dev -PmatrixKotlin=2.2.10
-done
+verify_sample_outputs() {
+  local sample_root="$1"
+  local aab="$sample_root/app/build/outputs/bundle/release/app-release.aab"
+  local baseline_aab="$sample_root/baseline/build/outputs/bundle/release/baseline-release.aab"
+  local evidence="$sample_root/app/build/reports/kaleido/release/release-evidence-set"
+  [[ -f "$aab" ]] || {
+    echo "KLD-PUBLICATION-001 Sample App final AAB is missing: $sample_root" >&2
+    exit 1
+  }
+  [[ -f "$baseline_aab" ]] || {
+    echo "KLD-PUBLICATION-001 Sample baseline AAB is missing: $sample_root" >&2
+    exit 1
+  }
+  [[ -f "$evidence/release-evidence-set-manifest.properties" ]] || {
+    echo "KLD-PUBLICATION-001 Sample App evidence manifest is missing: $sample_root" >&2
+    exit 1
+  }
+  grep -qx 'publicationResult=PUBLISHED' \
+    "$evidence/release-evidence-set-manifest.properties" || {
+      echo "KLD-PUBLICATION-001 Sample App evidence was not published: $sample_root" >&2
+      exit 1
+    }
+  [[ -f "$evidence/artifact-report.txt" ]] || {
+    echo "KLD-PUBLICATION-001 Sample App Artifact Report is missing: $sample_root" >&2
+    exit 1
+  }
+  [[ -f "$evidence/mappings/composed-mapping.txt" ]] || {
+    echo "KLD-PUBLICATION-001 Sample App composed mapping is missing: $sample_root" >&2
+    exit 1
+  }
+}
+
+sample=samples/kaleido-sample
+name="$(basename "$sample")"
+target="$work_root/$name"
+rm -rf "$target"
+mkdir -p "$target"
+cp -R "$repo_root/$sample/." "$target/"
+./gradlew -p "$target" clean :baseline:bundleRelease :app:bundleRelease \
+  -PsamplePluginRepository="$plugin_repository" \
+  -PsampleAgpVersion=9.2.0 -PsampleKaleidoVersion="$version"
+verify_sample_outputs "$target"
+
+[[ -f "$plugin_jar" ]] || {
+  echo "KLD-PUBLICATION-001 candidate plugin JAR is missing" >&2
+  exit 1
+}
+candidate_sha256="$(shasum -a 256 "$plugin_jar" | awk '{print $1}')"
 
 cat > "$work_root/documentation-validation.properties" <<EOF
 schema=KaleidoDocumentationValidation.v1
-candidate.version=0.1.0-dev
+candidate.version=$version
+candidate.sha256=$candidate_sha256
 markerResolution=PASS
-sampleSafe=PASS
-fullCompose=PASS
+sampleComprehensive=PASS
+baselineComparison=PASS
+releaseEvidenceClosure=PASS
 links=PASS
 diagnostics=PASS
 credentials=test-only

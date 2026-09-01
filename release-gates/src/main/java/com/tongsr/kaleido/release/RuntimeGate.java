@@ -18,7 +18,7 @@ public final class RuntimeGate {
             "java-safe",
             "kotlin-safe",
             "native-resource",
-            "sample-app",
+            "sample-comprehensive",
             "sana-reference");
 
     private RuntimeGate() {}

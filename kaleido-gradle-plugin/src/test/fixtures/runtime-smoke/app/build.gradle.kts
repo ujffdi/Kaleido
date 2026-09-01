@@ -1,6 +1,6 @@
 plugins {
-    id("com.android.application") version "9.2.1"
-    id("com.tongsr.kaleido") version "0.1.0-dev"
+    id("com.android.application") version "9.2.0"
+    id("io.github.ujffdi.kaleido") version "0.1.0-dev"
 }
 
 android {

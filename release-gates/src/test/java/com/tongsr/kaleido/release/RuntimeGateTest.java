@@ -1,6 +1,7 @@
 package com.tongsr.kaleido.release;
 
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
@@ -25,6 +26,15 @@ public final class RuntimeGateTest {
         assertTrue(text.contains("bundletool.version=1.18.1\n"));
         assertTrue(text.contains("fixture.native-resource.nativeLoad=PASS\n"));
         assertTrue(text.endsWith("verdict=PASS\n"));
+    }
+
+    @Test
+    public void runtimeUsesTheComprehensiveSampleAndTheDedicatedFullComposeFixture() {
+        assertTrue(RuntimeGate.requiredFixtures().contains("sample-comprehensive"));
+        assertTrue(RuntimeGate.requiredFixtures().contains("full-compose"));
+        assertFalse(RuntimeGate.requiredFixtures().contains("sample-app"));
+        assertFalse(RuntimeGate.requiredFixtures().contains("sample-safe"));
+        assertFalse(RuntimeGate.requiredFixtures().contains("sample-full-compose"));
     }
 
     @Test

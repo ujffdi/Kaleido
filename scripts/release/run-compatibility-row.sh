@@ -1,15 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [[ $# -ne 1 ]]; then
-  echo "usage: run-compatibility-row.sh A3|A4" >&2
+if [[ $# -ne 2 ]]; then
+  echo "usage: run-compatibility-row.sh A3|A4 VERSION" >&2
   exit 2
 fi
 
 matrix_row="$1"
+candidate_version="$2"
 case "$matrix_row" in
   A3)
-    matrix_agp="9.2.1"
+    matrix_agp="9.2.0"
     matrix_gradle="9.4.1"
     ;;
   A4)
@@ -21,6 +22,10 @@ case "$matrix_row" in
     exit 2
     ;;
 esac
+if [[ "$candidate_version" == *dev* || "$candidate_version" == *SNAPSHOT* ]]; then
+  echo "KLD-COMPAT-001 mandatory rows require a final candidate version" >&2
+  exit 2
+fi
 
 repository_root="$(cd "$(dirname "$0")/../.." && pwd)"
 matrix_gradle_command="${KALEIDO_MATRIX_GRADLE:-gradle}"
@@ -30,7 +35,7 @@ sana_aab_relative="${KALEIDO_SANA_MATRIX_AAB:-app/build/outputs/bundle/release/a
 matrix_output="$repository_root/build/release-gates/compatibility/$matrix_row"
 matrix_work="$matrix_output/work"
 plugin_repository="$repository_root/kaleido-gradle-plugin/build/functional-test-repository"
-plugin_jar="$repository_root/kaleido-gradle-plugin/build/libs/kaleido-gradle-plugin-0.1.0-dev.jar"
+plugin_jar="$repository_root/kaleido-gradle-plugin/build/libs/kaleido-gradle-plugin-$candidate_version.jar"
 
 if [[ "$(uname -s)" != "Linux" || "$(uname -m)" != "x86_64" ]]; then
   echo "KLD-COMPAT-001 $matrix_row requires Linux x86_64" >&2
@@ -52,11 +57,12 @@ if [[ -z "$sana_project" || ! -d "$sana_project" ]]; then
   echo "KLD-COMPAT-001 KALEIDO_SANA_MATRIX_PROJECT is required" >&2
   exit 1
 fi
-if ! rg -q 'id\("com[.]tongsr[.]kaleido"\)' "$sana_project" -g '*.gradle.kts'; then
+if ! rg -q 'id\("io[.]github[.]ujffdi[.]kaleido"\)' "$sana_project" -g '*.gradle.kts'; then
   echo "KLD-COMPAT-001 Sana matrix checkout does not apply the public Kaleido marker" >&2
   exit 1
 fi
 
+rm -rf "$matrix_work"
 mkdir -p "$matrix_work"
 test_store="$matrix_output/test-upload.p12"
 test_password="kaleido-matrix-test-signing"
@@ -93,9 +99,11 @@ file_digest() {
 
 cd "$repository_root"
 ./gradlew :kaleido-gradle-plugin:publishAllPublicationsToFunctionalTestRepository \
-  :kaleido-gradle-plugin:jar :release-gates:installDist --stacktrace
+  :kaleido-gradle-plugin:jar :release-gates:installDist \
+  -PkaleidoVersion="$candidate_version" --stacktrace
 ./gradlew :kaleido-gradle-plugin:test :kaleido-gradle-plugin:validatePlugins \
-  -PkaleidoTestAgp="$matrix_agp" -PkaleidoTestGradle="$matrix_gradle" --stacktrace
+  -PkaleidoVersion="$candidate_version" -PkaleidoTestAgp="$matrix_agp" \
+  -PkaleidoTestGradle="$matrix_gradle" --stacktrace
 
 fixture_arguments=()
 for fixture_name in java-safe kotlin-safe full-compose; do
@@ -105,26 +113,28 @@ for fixture_name in java-safe kotlin-safe full-compose; do
   cp -R "$fixture_source/." "$fixture_work/"
   "$matrix_gradle_command" -p "$fixture_work" clean bundleRelease --stacktrace \
     -PmatrixPluginRepository="$plugin_repository" -PmatrixAgp="$matrix_agp" \
-    -PmatrixKaleido=0.1.0-dev -PmatrixKotlin=2.2.10
+    -PmatrixKaleido="$candidate_version" -PmatrixKotlin=2.2.10
   fixture_aab="$fixture_work/app/build/outputs/bundle/release/app-release.aab"
   fixture_arguments+=(--fixture \
     "$fixture_name,$(tree_digest "$fixture_source"),$(file_digest "$fixture_aab"),PASS")
 done
 
+sample_name=sample-comprehensive
 sample_source="$repository_root/samples/kaleido-sample"
-sample_work="$matrix_work/sample-app"
+sample_work="$matrix_work/$sample_name"
 mkdir -p "$sample_work"
 cp -R "$sample_source/." "$sample_work/"
-"$matrix_gradle_command" -p "$sample_work" clean bundleRelease --stacktrace \
-  -PmatrixPluginRepository="$plugin_repository" -PmatrixAgp="$matrix_agp" \
-  -PmatrixKaleido=0.1.0-dev -PmatrixKotlin=2.2.10
+"$matrix_gradle_command" -p "$sample_work" clean \
+  :baseline:bundleRelease :app:bundleRelease --stacktrace \
+  -PsamplePluginRepository="$plugin_repository" -PsampleAgpVersion="$matrix_agp" \
+  -PsampleKaleidoVersion="$candidate_version"
 sample_aab="$sample_work/app/build/outputs/bundle/release/app-release.aab"
 fixture_arguments+=(--fixture \
-  "sample-app,$(tree_digest "$sample_source"),$(file_digest "$sample_aab"),PASS")
+  "$sample_name,$(tree_digest "$sample_source"),$(file_digest "$sample_aab"),PASS")
 
 "$matrix_gradle_command" -p "$sana_project" clean bundleRelease --stacktrace \
   -PmatrixPluginRepository="$plugin_repository" -PmatrixAgp="$matrix_agp" \
-  -PmatrixKaleido=0.1.0-dev -PmatrixKotlin=2.2.10
+  -PmatrixKaleido="$candidate_version" -PmatrixKotlin=2.2.10
 sana_aab="$sana_project/$sana_aab_relative"
 fixture_arguments+=(--fixture \
   "sana-reference,$(tree_digest "$sana_project"),$(file_digest "$sana_aab"),PASS")

@@ -42,7 +42,7 @@ public final class KaleidoPluginFunctionalTest {
     @Test
     public void packagedPluginFinalizesOrdinaryReleaseBundle() throws IOException {
         var projectDirectory = temporaryFolder.newFolder("consumer").toPath();
-        writeConsumer(projectDirectory, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(projectDirectory, "com.android.application", "io.github.ujffdi.kaleido");
 
         BuildResult result = runner(projectDirectory).withArguments("bundleRelease", "--stacktrace").build();
 
@@ -92,8 +92,8 @@ public final class KaleidoPluginFunctionalTest {
                 .filter(line -> line.startsWith("file="))
                 .toList();
         assertEquals(inventoryFiles.stream().sorted().toList(), inventoryFiles);
-        assertEquals(16, countFiles(generatedRoot(projectDirectory, "release").resolve("java"),
-                ".java"));
+        assertEquals(16, countFiles(generatedRoot(projectDirectory, "release").resolve("kotlin"),
+                ".kt"));
         assertEquals(8, countFiles(generatedRoot(projectDirectory, "release").resolve("res/layout"),
                 ".xml"));
         assertEquals(16, countFiles(
@@ -187,7 +187,7 @@ public final class KaleidoPluginFunctionalTest {
     @Test
     public void generatedTreeIsByteStableAndSeedSensitive() throws IOException {
         var projectDirectory = temporaryFolder.newFolder("deterministic-generation").toPath();
-        writeConsumer(projectDirectory, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(projectDirectory, "com.android.application", "io.github.ujffdi.kaleido");
         append(projectDirectory.resolve("app/build.gradle.kts"), """
 
                 kaleido { seed.set(providers.environmentVariable("KALEIDO_GENERATION_SEED")) }
@@ -217,7 +217,7 @@ public final class KaleidoPluginFunctionalTest {
     public void r8InputsRawMappingAndCompositionAreByteStableAndSeedSensitive()
             throws IOException {
         var projectDirectory = temporaryFolder.newFolder("deterministic-r8").toPath();
-        writeConsumer(projectDirectory, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(projectDirectory, "com.android.application", "io.github.ujffdi.kaleido");
         append(projectDirectory.resolve("app/build.gradle.kts"), """
 
                 kaleido { seed.set(providers.environmentVariable("KALEIDO_R8_SEED")) }
@@ -259,7 +259,7 @@ public final class KaleidoPluginFunctionalTest {
         var firstProject = temporaryFolder.newFolder("independent-build-a").toPath();
         var secondProject = temporaryFolder.newFolder("independent-build-b").toPath();
         for (var projectDirectory : List.of(firstProject, secondProject)) {
-            writeConsumer(projectDirectory, "com.android.application", "com.tongsr.kaleido");
+            writeConsumer(projectDirectory, "com.android.application", "io.github.ujffdi.kaleido");
             append(projectDirectory.resolve("app/build.gradle.kts"), """
 
                     kaleido { seed.set(providers.provider { "independent-canonical-seed" }) }
@@ -281,7 +281,7 @@ public final class KaleidoPluginFunctionalTest {
     @Test
     public void applyingBeforeAndroidApplicationFailsWithStableDiagnostic() throws IOException {
         var projectDirectory = temporaryFolder.newFolder("invalid-order").toPath();
-        writeConsumer(projectDirectory, "com.tongsr.kaleido", "com.android.application");
+        writeConsumer(projectDirectory, "io.github.ujffdi.kaleido", "com.android.application");
 
         BuildResult result = runner(projectDirectory).withArguments("tasks", "--stacktrace").buildAndFail();
 
@@ -294,7 +294,7 @@ public final class KaleidoPluginFunctionalTest {
     @Test
     public void flavoredReleaseVariantsAreIndependentlyFinalized() throws IOException {
         var projectDirectory = temporaryFolder.newFolder("flavored").toPath();
-        writeConsumer(projectDirectory, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(projectDirectory, "com.android.application", "io.github.ujffdi.kaleido");
         append(projectDirectory.resolve("app/build.gradle.kts"), """
 
                 android {
@@ -337,7 +337,7 @@ public final class KaleidoPluginFunctionalTest {
     @Test
     public void ordinaryLibrariesDependenciesAndNativePayloadAreAccepted() throws IOException {
         var projectDirectory = temporaryFolder.newFolder("ordinary-dependencies").toPath();
-        writeConsumer(projectDirectory, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(projectDirectory, "com.android.application", "io.github.ujffdi.kaleido");
         append(projectDirectory.resolve("settings.gradle.kts"), "\ninclude(\":library\")\n");
         write(projectDirectory.resolve("library/build.gradle.kts"), """
                 plugins { id("com.android.library") version %s }
@@ -392,7 +392,7 @@ public final class KaleidoPluginFunctionalTest {
     @Test
     public void protectedManifestClassRemainsUnchanged() throws IOException {
         var projectDirectory = temporaryFolder.newFolder("protected-manifest-class").toPath();
-        writeConsumer(projectDirectory, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(projectDirectory, "com.android.application", "io.github.ujffdi.kaleido");
         append(projectDirectory.resolve("app/build.gradle.kts"), """
 
                 kaleido {
@@ -417,7 +417,7 @@ public final class KaleidoPluginFunctionalTest {
     @Test
     public void builtInKotlinComponentFamilyMetadataIsRewrittenAndBundles() throws IOException {
         var projectDirectory = temporaryFolder.newFolder("kotlin-component-family").toPath();
-        writeConsumer(projectDirectory, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(projectDirectory, "com.android.application", "io.github.ujffdi.kaleido");
         Files.delete(projectDirectory.resolve(
                 "app/src/main/java/example/consumer/MainActivity.java"));
         write(projectDirectory.resolve(
@@ -467,7 +467,7 @@ public final class KaleidoPluginFunctionalTest {
     @Test
     public void typedClassEscapeHatchProtectsExactIdentityAndRecordsEvidence() throws IOException {
         var projectDirectory = temporaryFolder.newFolder("typed-class-protection").toPath();
-        writeConsumer(projectDirectory, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(projectDirectory, "com.android.application", "io.github.ujffdi.kaleido");
         append(projectDirectory.resolve("app/build.gradle.kts"), """
 
                 kaleido {
@@ -509,7 +509,7 @@ public final class KaleidoPluginFunctionalTest {
     @Test
     public void zeroMatchAndGlobalEscapeHatchesFailClosed() throws IOException {
         var zeroMatch = temporaryFolder.newFolder("zero-match-protection").toPath();
-        writeConsumer(zeroMatch, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(zeroMatch, "com.android.application", "io.github.ujffdi.kaleido");
         append(zeroMatch.resolve("app/build.gradle.kts"), """
 
                 kaleido {
@@ -529,7 +529,7 @@ public final class KaleidoPluginFunctionalTest {
         assertTrue(zeroFailure.getOutput().contains("resolves to zero PROJECT classes"));
 
         var global = temporaryFolder.newFolder("global-protection").toPath();
-        writeConsumer(global, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(global, "com.android.application", "io.github.ujffdi.kaleido");
         append(global.resolve("app/build.gradle.kts"), """
 
                 kaleido {
@@ -552,7 +552,7 @@ public final class KaleidoPluginFunctionalTest {
     @Test
     public void semanticLayoutClassReferenceAndDefinitionCloseTogether() throws IOException {
         var projectDirectory = temporaryFolder.newFolder("semantic-layout").toPath();
-        writeConsumer(projectDirectory, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(projectDirectory, "com.android.application", "io.github.ujffdi.kaleido");
         write(projectDirectory.resolve(
                 "app/src/main/java/example/consumer/CustomView.java"), """
                 package example.consumer;
@@ -597,7 +597,7 @@ public final class KaleidoPluginFunctionalTest {
     @Test
     public void exactReflectionAndNativeDeclarationsCreateMinimalProtection() throws IOException {
         var projectDirectory = temporaryFolder.newFolder("inferred-protection").toPath();
-        writeConsumer(projectDirectory, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(projectDirectory, "com.android.application", "io.github.ujffdi.kaleido");
         write(projectDirectory.resolve(
                 "app/src/main/java/example/consumer/ReflectiveTarget.java"), """
                 package example.consumer;
@@ -650,7 +650,7 @@ public final class KaleidoPluginFunctionalTest {
     @Test
     public void manifestNativeActivityIsProtectedBeforeSemanticRewrite() throws Exception {
         var projectDirectory = temporaryFolder.newFolder("manifest-native-protection").toPath();
-        writeConsumer(projectDirectory, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(projectDirectory, "com.android.application", "io.github.ujffdi.kaleido");
         write(projectDirectory.resolve(
                 "app/src/main/java/example/consumer/MainActivity.java"), """
                 package example.consumer;
@@ -684,7 +684,7 @@ public final class KaleidoPluginFunctionalTest {
     @Test
     public void resourceProtectionRejectsToolsDiscardConflict() throws IOException {
         var projectDirectory = temporaryFolder.newFolder("resource-protection-conflict").toPath();
-        writeConsumer(projectDirectory, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(projectDirectory, "com.android.application", "io.github.ujffdi.kaleido");
         write(projectDirectory.resolve("app/src/main/res/values/protected.xml"), """
                 <resources xmlns:tools="http://schemas.android.com/tools"
                     tools:discard="@string/stable_name">
@@ -717,7 +717,7 @@ public final class KaleidoPluginFunctionalTest {
     @Test
     public void resourceNameAndPackagedPathProtectionRemainUnchanged() throws IOException {
         var projectDirectory = temporaryFolder.newFolder("resource-protection").toPath();
-        writeConsumer(projectDirectory, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(projectDirectory, "com.android.application", "io.github.ujffdi.kaleido");
         write(projectDirectory.resolve("app/src/main/res/values/protected.xml"), """
                 <resources><string name="stable_label">stable</string></resources>
                 """);
@@ -763,7 +763,7 @@ public final class KaleidoPluginFunctionalTest {
     public void compatiblePayloadsDeduplicateWithoutMergingIdsOrQualifiers()
             throws IOException {
         var projectDirectory = temporaryFolder.newFolder("resource-deduplication").toPath();
-        writeConsumer(projectDirectory, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(projectDirectory, "com.android.application", "io.github.ujffdi.kaleido");
         var png = Base64.getDecoder().decode(
                 "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUB"
                         + "AScY42YAAAAASUVORK5CYII=");
@@ -834,7 +834,7 @@ public final class KaleidoPluginFunctionalTest {
     public void toolsKeepAndPublicResourcesBecomeNameProtectionRequirements()
             throws IOException {
         var projectDirectory = temporaryFolder.newFolder("automatic-resource-protection").toPath();
-        writeConsumer(projectDirectory, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(projectDirectory, "com.android.application", "io.github.ujffdi.kaleido");
         write(projectDirectory.resolve("app/src/main/res/values/public.xml"), """
                 <resources>
                     <string name="public_label">public</string>
@@ -869,7 +869,7 @@ public final class KaleidoPluginFunctionalTest {
     public void exactGetIdentifierTargetBecomesNameProtectionRequirement()
             throws IOException {
         var projectDirectory = temporaryFolder.newFolder("get-identifier-protection").toPath();
-        writeConsumer(projectDirectory, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(projectDirectory, "com.android.application", "io.github.ujffdi.kaleido");
         write(projectDirectory.resolve("app/src/main/res/values/runtime.xml"), """
                 <resources><string name="runtime_label">runtime</string></resources>
                 """);
@@ -917,7 +917,7 @@ public final class KaleidoPluginFunctionalTest {
     @Test
     public void dynamicFeatureDeclarationFailsBeforeOutput() throws IOException {
         var projectDirectory = temporaryFolder.newFolder("dynamic-feature").toPath();
-        writeConsumer(projectDirectory, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(projectDirectory, "com.android.application", "io.github.ujffdi.kaleido");
         append(projectDirectory.resolve("app/build.gradle.kts"), """
 
                 android { dynamicFeatures += setOf(":feature") }
@@ -934,7 +934,7 @@ public final class KaleidoPluginFunctionalTest {
     @Test
     public void assetPackDeclarationFailsBeforeOutput() throws IOException {
         var projectDirectory = temporaryFolder.newFolder("asset-pack").toPath();
-        writeConsumer(projectDirectory, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(projectDirectory, "com.android.application", "io.github.ujffdi.kaleido");
         append(projectDirectory.resolve("app/build.gradle.kts"), """
 
                 android { assetPacks += setOf(":assets") }
@@ -951,7 +951,7 @@ public final class KaleidoPluginFunctionalTest {
     @Test
     public void nonMinifiedReleaseFailsBeforeOutput() throws IOException {
         var projectDirectory = temporaryFolder.newFolder("not-minified").toPath();
-        writeConsumer(projectDirectory, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(projectDirectory, "com.android.application", "io.github.ujffdi.kaleido");
         var buildFile = projectDirectory.resolve("app/build.gradle.kts");
         Files.writeString(
                 buildFile,
@@ -970,7 +970,7 @@ public final class KaleidoPluginFunctionalTest {
     @Test
     public void disabledReleaseVariantFailsAdoptionTask() throws IOException {
         var projectDirectory = temporaryFolder.newFolder("disabled-release").toPath();
-        writeConsumer(projectDirectory, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(projectDirectory, "com.android.application", "io.github.ujffdi.kaleido");
         append(projectDirectory.resolve("app/build.gradle.kts"), """
 
                 androidComponents {
@@ -991,7 +991,7 @@ public final class KaleidoPluginFunctionalTest {
     @Test
     public void confirmedExternalDexLoadingFailsBeforeFinalBundleOutput() throws IOException {
         var projectDirectory = temporaryFolder.newFolder("external-code").toPath();
-        writeConsumer(projectDirectory, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(projectDirectory, "com.android.application", "io.github.ujffdi.kaleido");
         write(projectDirectory.resolve("app/src/main/java/example/consumer/MainActivity.java"), """
                 package example.consumer;
 
@@ -1029,7 +1029,7 @@ public final class KaleidoPluginFunctionalTest {
     @Test
     public void explicitSeedProviderIsLazyNormalizedAndNeverEmitted() throws IOException {
         var projectDirectory = temporaryFolder.newFolder("explicit-seed").toPath();
-        writeConsumer(projectDirectory, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(projectDirectory, "com.android.application", "io.github.ujffdi.kaleido");
         append(projectDirectory.resolve("app/build.gradle.kts"), """
 
                 kaleido {
@@ -1068,7 +1068,7 @@ public final class KaleidoPluginFunctionalTest {
     @Test
     public void missingExplicitSeedProviderFailsWithStableDiagnostic() throws IOException {
         var projectDirectory = temporaryFolder.newFolder("missing-seed").toPath();
-        writeConsumer(projectDirectory, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(projectDirectory, "com.android.application", "io.github.ujffdi.kaleido");
         append(projectDirectory.resolve("app/build.gradle.kts"), """
 
                 kaleido {
@@ -1089,7 +1089,7 @@ public final class KaleidoPluginFunctionalTest {
     @Test
     public void fullProfileOnlyUnlocksExplicitControls() throws IOException {
         var projectDirectory = temporaryFolder.newFolder("full-profile").toPath();
-        writeConsumer(projectDirectory, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(projectDirectory, "com.android.application", "io.github.ujffdi.kaleido");
         write(projectDirectory.resolve("app/unused-strings.txt"), "unused_label\n");
         write(projectDirectory.resolve("app/src/main/res/values/full.xml"), """
                 <resources>
@@ -1167,7 +1167,7 @@ public final class KaleidoPluginFunctionalTest {
     public void fullProfileActivitiesAreInertMappedAndAbsentWhenUnconfigured()
             throws IOException {
         var configured = temporaryFolder.newFolder("full-components").toPath();
-        writeConsumer(configured, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(configured, "com.android.application", "io.github.ujffdi.kaleido");
         append(configured.resolve("app/build.gradle.kts"), """
 
                 kaleido {
@@ -1194,10 +1194,10 @@ public final class KaleidoPluginFunctionalTest {
                 unsignedBundle(configured, "release"),
                 "base/manifest/AndroidManifest.xml"));
         for (var original : originals) {
-            var generatedSource = generatedRoot(configured, "release").resolve("java")
-                    .resolve(original.replace('.', '/') + ".java");
+            var generatedSource = generatedRoot(configured, "release").resolve("kotlin")
+                    .resolve(original.replace('.', '/') + ".kt");
             var source = Files.readString(generatedSource);
-            assertTrue(source.contains("extends android.app.Activity"));
+            assertTrue(source.contains(" : android.app.Activity()"));
             assertFalse(source.contains("Intent"));
             assertFalse(source.contains("Log"));
             var rewritten = mappedTarget(rawMapping, original);
@@ -1215,7 +1215,7 @@ public final class KaleidoPluginFunctionalTest {
         assertReleaseEvidenceSet(configured, "release", originals.get(0));
 
         var unconfigured = temporaryFolder.newFolder("full-components-unconfigured").toPath();
-        writeConsumer(unconfigured, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(unconfigured, "com.android.application", "io.github.ujffdi.kaleido");
         append(unconfigured.resolve("app/build.gradle.kts"), """
 
                 kaleido {
@@ -1236,7 +1236,7 @@ public final class KaleidoPluginFunctionalTest {
     public void fullProfileActivityCollisionFailsBeforeGeneratedMutation()
             throws IOException {
         var projectDirectory = temporaryFolder.newFolder("full-component-collision").toPath();
-        writeConsumer(projectDirectory, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(projectDirectory, "com.android.application", "io.github.ujffdi.kaleido");
         var rawSeed = "full-component-collision-seed";
         var expected = FullComponentGenerationEngine.plan(
                 functionalFullComponentPlan(rawSeed, 1).values(), Set.of(), Set.of());
@@ -1271,7 +1271,7 @@ public final class KaleidoPluginFunctionalTest {
     public void fullResourceControlFailsBeforeMutationAtProtectionBoundary()
             throws IOException {
         var projectDirectory = temporaryFolder.newFolder("full-protected-control").toPath();
-        writeConsumer(projectDirectory, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(projectDirectory, "com.android.application", "io.github.ujffdi.kaleido");
         write(projectDirectory.resolve("app/unused-strings.txt"), "protected_label\n");
         write(projectDirectory.resolve("app/src/main/res/values/protected.xml"), """
                 <resources><string name="protected_label">stable</string></resources>
@@ -1300,7 +1300,7 @@ public final class KaleidoPluginFunctionalTest {
     @Test
     public void invalidDslFailsBeforeKaleidoOutput() throws IOException {
         var projectDirectory = temporaryFolder.newFolder("invalid-dsl").toPath();
-        writeConsumer(projectDirectory, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(projectDirectory, "com.android.application", "io.github.ujffdi.kaleido");
         append(projectDirectory.resolve("app/build.gradle.kts"), """
 
                 kaleido { generation { packageCount.set(0) } }
@@ -1319,7 +1319,7 @@ public final class KaleidoPluginFunctionalTest {
     @Test
     public void safeProfileCannotSelectFullOnlyControls() throws IOException {
         var projectDirectory = temporaryFolder.newFolder("safe-full-control").toPath();
-        writeConsumer(projectDirectory, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(projectDirectory, "com.android.application", "io.github.ujffdi.kaleido");
         append(projectDirectory.resolve("app/build.gradle.kts"), """
 
                 kaleido { resources { replaceUnusedStrings.set(true) } }
@@ -1338,7 +1338,7 @@ public final class KaleidoPluginFunctionalTest {
     public void completeTopLevelSigningSourceSignsAndVerifiesExactCandidate()
             throws Exception {
         var projectDirectory = temporaryFolder.newFolder("complete-signing").toPath();
-        writeConsumer(projectDirectory, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(projectDirectory, "com.android.application", "io.github.ujffdi.kaleido");
         var keyStore = projectDirectory.resolve("app/upload.p12");
         var password = "kaleido-signing-sentinel";
         createTestKeyStore(keyStore, password, "upload");
@@ -1407,7 +1407,7 @@ public final class KaleidoPluginFunctionalTest {
     public void composeGeneratorCompilesRuntimeOnlyGraphAndRetainsMappedInventory()
             throws Exception {
         var projectDirectory = temporaryFolder.newFolder("compose-generation").toPath();
-        writeConsumer(projectDirectory, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(projectDirectory, "com.android.application", "io.github.ujffdi.kaleido");
         enableComposeConsumer(projectDirectory, true, true, true);
         append(projectDirectory.resolve("app/build.gradle.kts"), """
 
@@ -1425,8 +1425,16 @@ public final class KaleidoPluginFunctionalTest {
         runner(projectDirectory).withArguments("bundleRelease", "--stacktrace").build();
 
         var generated = generatedRoot(projectDirectory, "release").resolve("kotlin");
-        var sources = Files.walk(generated).filter(Files::isRegularFile).sorted().toList();
+        var sources = Files.walk(generated)
+                .filter(Files::isRegularFile)
+                .filter(path -> path.toString().replace('\\', '/').contains("/compose/"))
+                .sorted()
+                .toList();
         assertEquals(2, sources.size());
+        assertEquals(16, Files.walk(generated)
+                .filter(Files::isRegularFile)
+                .filter(path -> !path.toString().replace('\\', '/').contains("/compose/"))
+                .count());
         for (var source : sources) {
             var text = Files.readString(source);
             assertTrue(text.contains("import androidx.compose.runtime.Composable"));
@@ -1480,7 +1488,7 @@ public final class KaleidoPluginFunctionalTest {
     public void composeGeneratorRejectsMissingPrerequisitesAndExcessiveScale()
             throws Exception {
         var missingFeature = temporaryFolder.newFolder("compose-missing-feature").toPath();
-        writeConsumer(missingFeature, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(missingFeature, "com.android.application", "io.github.ujffdi.kaleido");
         enableComposeConsumer(missingFeature, true, false, true);
         appendComposeEnabled(missingFeature, 1, 1);
         var featureFailure = runner(missingFeature)
@@ -1489,7 +1497,7 @@ public final class KaleidoPluginFunctionalTest {
                 "Compose Generator requires buildFeatures.compose to be true"));
 
         var missingCompiler = temporaryFolder.newFolder("compose-missing-compiler").toPath();
-        writeConsumer(missingCompiler, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(missingCompiler, "com.android.application", "io.github.ujffdi.kaleido");
         enableComposeConsumer(missingCompiler, false, true, true);
         appendComposeEnabled(missingCompiler, 1, 1);
         var compilerFailure = runner(missingCompiler)
@@ -1498,7 +1506,7 @@ public final class KaleidoPluginFunctionalTest {
                 "Compose Generator requires org.jetbrains.kotlin.plugin.compose"));
 
         var missingRuntime = temporaryFolder.newFolder("compose-missing-runtime").toPath();
-        writeConsumer(missingRuntime, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(missingRuntime, "com.android.application", "io.github.ujffdi.kaleido");
         enableComposeConsumer(missingRuntime, true, true, false);
         appendComposeEnabled(missingRuntime, 1, 1);
         var runtimeFailure = runner(missingRuntime)
@@ -1507,7 +1515,7 @@ public final class KaleidoPluginFunctionalTest {
                 "Compose Runtime is not resolvable on the Release compile classpath"));
 
         var excessive = temporaryFolder.newFolder("compose-excessive").toPath();
-        writeConsumer(excessive, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(excessive, "com.android.application", "io.github.ujffdi.kaleido");
         enableComposeConsumer(excessive, true, true, true);
         appendComposeEnabled(excessive, 64, 9);
         var scaleFailure = runner(excessive)
@@ -1519,7 +1527,7 @@ public final class KaleidoPluginFunctionalTest {
     public void fullComposeGeneratorSucceedsAndConsumerIncomingEdgeFailsClosed()
             throws Exception {
         var full = temporaryFolder.newFolder("full-compose-generation").toPath();
-        writeConsumer(full, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(full, "com.android.application", "io.github.ujffdi.kaleido");
         enableComposeConsumer(full, true, true, true);
         append(full.resolve("app/build.gradle.kts"), """
 
@@ -1536,7 +1544,7 @@ public final class KaleidoPluginFunctionalTest {
         assertTrue(fullReceipt.contains("functions=1\n"));
 
         var incoming = temporaryFolder.newFolder("compose-incoming-edge").toPath();
-        writeConsumer(incoming, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(incoming, "com.android.application", "io.github.ujffdi.kaleido");
         enableComposeConsumer(incoming, true, true, true);
         var rawSeed = "incoming-compose-seed";
         append(incoming.resolve("app/build.gradle.kts"), """
@@ -1577,7 +1585,7 @@ public final class KaleidoPluginFunctionalTest {
     public void partialExactVariantSigningFailsWithoutFallingThroughOrLeakingSecrets()
             throws IOException {
         var projectDirectory = temporaryFolder.newFolder("partial-signing").toPath();
-        writeConsumer(projectDirectory, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(projectDirectory, "com.android.application", "io.github.ujffdi.kaleido");
         var sentinel = "partial-signing-sentinel";
         append(projectDirectory.resolve("app/build.gradle.kts"), """
 
@@ -1609,7 +1617,7 @@ public final class KaleidoPluginFunctionalTest {
     public void failedReplacementPreservesPriorPublishedBundleAndEvidence()
             throws IOException {
         var projectDirectory = temporaryFolder.newFolder("atomic-publication-preserve").toPath();
-        writeConsumer(projectDirectory, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(projectDirectory, "com.android.application", "io.github.ujffdi.kaleido");
         runner(projectDirectory).withArguments("bundleRelease", "--stacktrace").build();
         var publicBundle = projectDirectory.resolve(
                 "app/build/outputs/bundle/release/app-release.aab");
@@ -1634,7 +1642,7 @@ public final class KaleidoPluginFunctionalTest {
     public void environmentSigningRejectsMissingWrongCertificateAndWrongAlias()
             throws IOException {
         var projectDirectory = temporaryFolder.newFolder("invalid-environment-signing").toPath();
-        writeConsumer(projectDirectory, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(projectDirectory, "com.android.application", "io.github.ujffdi.kaleido");
 
         var missing = new HashMap<>(testSigningEnvironment());
         missing.keySet().removeIf(key -> key.startsWith("KALEIDO_UPLOAD_"));
@@ -1681,7 +1689,7 @@ public final class KaleidoPluginFunctionalTest {
     @Test
     public void configurationCacheIsReusedWithoutCapturingGradleModelObjects() throws IOException {
         var projectDirectory = temporaryFolder.newFolder("configuration-cache").toPath();
-        writeConsumer(projectDirectory, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(projectDirectory, "com.android.application", "io.github.ujffdi.kaleido");
         append(projectDirectory.resolve("app/build.gradle.kts"), """
 
                 kaleido {
@@ -1711,7 +1719,7 @@ public final class KaleidoPluginFunctionalTest {
     public void noCleanBuildKeepsDeterministicStagesUpToDateAndRevalidatesSensitiveStages()
             throws IOException {
         var projectDirectory = temporaryFolder.newFolder("no-clean-up-to-date").toPath();
-        writeConsumer(projectDirectory, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(projectDirectory, "com.android.application", "io.github.ujffdi.kaleido");
 
         runner(projectDirectory)
                 .withArguments("bundleRelease", "--no-build-cache", "--stacktrace").build();
@@ -1728,8 +1736,8 @@ public final class KaleidoPluginFunctionalTest {
         var cache = temporaryFolder.newFolder("consumer-build-cache").toPath();
         var first = temporaryFolder.newFolder("cache-source").toPath();
         var relocated = temporaryFolder.newFolder("cache-relocated").toPath();
-        writeConsumer(first, "com.android.application", "com.tongsr.kaleido");
-        writeConsumer(relocated, "com.android.application", "com.tongsr.kaleido");
+        writeConsumer(first, "com.android.application", "io.github.ujffdi.kaleido");
+        writeConsumer(relocated, "com.android.application", "io.github.ujffdi.kaleido");
         configureLocalBuildCache(first, cache);
         configureLocalBuildCache(relocated, cache);
 
@@ -1767,7 +1775,7 @@ public final class KaleidoPluginFunctionalTest {
         var snapshots = new java.util.ArrayList<Map<String, String>>();
         for (var index = 0; index < workspaces.size(); index++) {
             var workspace = workspaces.get(index);
-            writeConsumer(workspace, "com.android.application", "com.tongsr.kaleido");
+            writeConsumer(workspace, "com.android.application", "io.github.ujffdi.kaleido");
             var firstName = index % 2 == 0 ? "ExtraA" : "ExtraB";
             var secondName = index % 2 == 0 ? "ExtraB" : "ExtraA";
             writeExtraClass(workspace, firstName);
@@ -1917,13 +1925,13 @@ public final class KaleidoPluginFunctionalTest {
         write(projectDirectory.resolve("library/build.gradle.kts"), """
                 plugins {
                     id("com.android.library") version %s
-                    id("com.tongsr.kaleido") version "0.1.0-dev"
+                    id("io.github.ujffdi.kaleido") version %s
                 }
                 android {
                     namespace = "example.library"
                     compileSdk = 36
                 }
-                """.formatted(quoted(testAgpVersion())));
+                """.formatted(quoted(testAgpVersion()), quoted(testPluginVersion())));
         write(projectDirectory.resolve("library/src/main/AndroidManifest.xml"), "<manifest />\n");
     }
 
@@ -2009,10 +2017,12 @@ public final class KaleidoPluginFunctionalTest {
         var buildFile = projectDirectory.resolve("app/build.gradle.kts");
         var script = Files.readString(buildFile);
         if (compilerPlugin) {
+            var kaleidoDeclaration = "id(\"io.github.ujffdi.kaleido\") version "
+                    + quoted(testPluginVersion());
             script = script.replace(
-                    "id(\"com.tongsr.kaleido\") version \"0.1.0-dev\"",
+                    kaleidoDeclaration,
                     "id(\"org.jetbrains.kotlin.plugin.compose\") version \"2.2.10\"\n"
-                            + "    id(\"com.tongsr.kaleido\") version \"0.1.0-dev\"");
+                            + "    " + kaleidoDeclaration);
         }
         if (buildFeature) {
             script = script.replace("android {", "android {\n    buildFeatures { compose = true }");
@@ -2040,12 +2050,16 @@ public final class KaleidoPluginFunctionalTest {
     }
 
     private static String pluginVersion(String pluginId) {
-        return quoted(pluginId.equals("com.tongsr.kaleido")
-                ? "0.1.0-dev" : testAgpVersion());
+        return quoted(pluginId.equals("io.github.ujffdi.kaleido")
+                ? testPluginVersion() : testAgpVersion());
+    }
+
+    private static String testPluginVersion() {
+        return System.getProperty("kaleido.test.plugin.version", "0.1.0-dev");
     }
 
     private static String testAgpVersion() {
-        return System.getProperty("kaleido.test.agp", "9.2.1");
+        return System.getProperty("kaleido.test.agp", "9.2.0");
     }
 
     private static String testGradleVersion() {

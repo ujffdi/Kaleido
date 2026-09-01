@@ -29,7 +29,10 @@ git -C "$repo_root" archive --format=tar.gz --prefix="kaleido-$version/" -o "$so
 declare -a assets=(
   "$repo_root/kaleido-gradle-plugin/build/libs/kaleido-gradle-plugin-$version.jar"
   "$repo_root/kaleido-gradle-plugin/build/libs/kaleido-gradle-plugin-$version-sources.jar"
-  "$repo_root/kaleido-gradle-plugin/build/functional-test-repository/com/tongsr/kaleido/com.tongsr.kaleido.gradle.plugin/$version/com.tongsr.kaleido.gradle.plugin-$version.pom"
+  "$repo_root/kaleido-gradle-plugin/build/libs/kaleido-gradle-plugin-$version-javadoc.jar"
+  "$repo_root/kaleido-gradle-plugin/build/publications/pluginMaven/pom-default.xml"
+  "$repo_root/kaleido-gradle-plugin/build/publications/pluginMaven/module.json"
+  "$repo_root/kaleido-gradle-plugin/build/publications/kaleidoPluginMarkerMaven/pom-default.xml"
   "$repo_root/build/release-gates/supply-chain/kaleido-$version.cdx.json"
   "$repo_root/build/release-gates/supply-chain/source-dependency-inventory.properties"
   "$repo_root/build/release-gates/supply-chain/content-similarity-audit.properties"

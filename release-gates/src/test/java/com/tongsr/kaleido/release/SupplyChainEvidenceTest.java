@@ -27,6 +27,7 @@ public final class SupplyChainEvidenceTest {
         var text = new String(first, StandardCharsets.UTF_8);
         assertTrue(text.contains("\"specVersion\": \"1.7\""));
         assertTrue(text.contains("\"aggregate\": \"complete\""));
+        assertTrue(text.contains("pkg:maven/io.github.ujffdi/kaleido-gradle-plugin@1.0.0"));
         assertTrue(text.contains("pkg:maven/com.android.tools.build/bundletool@1.18.1"));
         assertTrue(text.contains("\"id\": \"Apache-2.0\""));
         assertTrue(text.endsWith("}\n"));

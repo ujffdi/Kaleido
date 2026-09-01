@@ -1,6 +1,6 @@
 plugins {
     id("com.android.application")
-    id("com.tongsr.kaleido")
+    id("io.github.ujffdi.kaleido")
 }
 
 android {

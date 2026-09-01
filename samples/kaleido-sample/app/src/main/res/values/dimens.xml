@@ -1,0 +1,9 @@
+<resources>
+    <dimen name="probe_screen_padding">20dp</dimen>
+    <dimen name="probe_spacing">16dp</dimen>
+    <dimen name="probe_spacing_small">8dp</dimen>
+    <dimen name="probe_icon_size">64dp</dimen>
+    <dimen name="probe_icon_margin">6dp</dimen>
+    <dimen name="probe_title_size">24sp</dimen>
+    <dimen name="probe_body_size">14sp</dimen>
+</resources>

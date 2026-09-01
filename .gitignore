@@ -10,3 +10,9 @@
 .cxx
 *.hprof
 local.properties
+
+# Local agent configuration, context, and planning artifacts
+/AGENTS.md
+/CONTEXT.md
+/docs/agents/
+/.scratch/

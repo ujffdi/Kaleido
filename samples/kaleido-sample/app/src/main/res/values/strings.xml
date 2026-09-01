@@ -1,4 +1,28 @@
 <resources>
-    <string name="app_name">Kaleido Sample</string>
-    <string name="sample_message">Kaleido Safe Profile sample</string>
+    <string name="app_name">Kaleido Comprehensive Sample</string>
+    <string name="probe_title">Resource transformation probe</string>
+    <string name="probe_message">The baseline and Kaleido modules render this same source tree.</string>
+    <string name="selector_probe">Pressed-state selector probe</string>
+    <string name="status_pending">Running resource checks…</string>
+    <string name="status_pass">PASS — %1$d checks\n%2$s</string>
+    <string name="status_fail">FAIL — %1$d checks\n%2$s</string>
+    <string name="runtime_label">runtime-ok</string>
+    <string name="public_label">public-ok</string>
+    <string name="kept_label">kept-ok</string>
+    <string name="sample_status">full-compose-ok</string>
+    <string name="compose_probe_title">Consumer Compose probe</string>
+    <string name="compose_probe_message">Kaleido-generated Compose code remains runtime-only build content.</string>
+    <string name="locale_probe">locale-default</string>
+    <string name="confirmed_unused_label">replace-this-unused-value</string>
+    <string name="icon_left_long">Long left arrow</string>
+    <string name="icon_left_long_duplicate">Duplicate long left arrow</string>
+    <string name="icon_up_right_long">Long up-right arrow</string>
+    <string name="icon_up_right_long_duplicate">Duplicate long up-right arrow</string>
+    <string name="icon_up_long">Long up arrow</string>
+    <string name="icon_up_long_compact">Compact long up arrow</string>
+    <string name="icon_chevron_up">Up chevron</string>
+    <string name="icon_right_circle">Right arrow in a circle</string>
+    <string name="icon_next_bar">Next arrow with end bar</string>
+    <string name="icon_chevron_left">Left chevron</string>
+    <string name="icon_down_right">Down-right arrow</string>
 </resources>

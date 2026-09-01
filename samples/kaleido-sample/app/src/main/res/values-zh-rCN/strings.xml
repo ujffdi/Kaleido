@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Kaleido 资源对比</string>
+    <string name="probe_title">资源转换探针</string>
+    <string name="probe_message">Baseline 与 Kaleido 模块渲染同一份源码资源。</string>
+    <string name="selector_probe">按压状态选择器</string>
+    <string name="status_pending">正在检查资源…</string>
+    <string name="sample_status">full-compose-zh-cn-ok</string>
+    <string name="compose_probe_title">Consumer Compose 探针</string>
+    <string name="compose_probe_message">Kaleido 生成的 Compose 代码仅作为运行时不可达的构建内容保留。</string>
+    <string name="locale_probe">locale-zh-cn</string>
+</resources>

@@ -1,18 +1,23 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [[ $# -ne 2 ]]; then
-  echo "usage: run-runtime-row.sh A3|A4 <device-serial>" >&2
+if [[ $# -ne 3 ]]; then
+  echo "usage: run-runtime-row.sh A3|A4 <device-serial> VERSION" >&2
   exit 2
 fi
 
 runtime_row="$1"
 device_serial="$2"
+candidate_version="$3"
 case "$runtime_row" in
-  A3) runtime_agp="9.2.1" ;;
+  A3) runtime_agp="9.2.0" ;;
   A4) runtime_agp="9.3.2" ;;
   *) echo "KLD-RUNTIME-001 unsupported mandatory row: $runtime_row" >&2; exit 2 ;;
 esac
+if [[ "$candidate_version" == *dev* || "$candidate_version" == *SNAPSHOT* ]]; then
+  echo "KLD-RUNTIME-001 mandatory rows require a final candidate version" >&2
+  exit 2
+fi
 
 repository_root="$(cd "$(dirname "$0")/../.." && pwd)"
 runtime_gradle="${KALEIDO_MATRIX_GRADLE:-gradle}"
@@ -22,7 +27,7 @@ matrix_record="$runtime_output/matrix-record.properties"
 matrix_work="$runtime_output/work"
 runtime_work="$runtime_output/runtime"
 plugin_repository="$repository_root/kaleido-gradle-plugin/build/functional-test-repository"
-plugin_jar="$repository_root/kaleido-gradle-plugin/build/libs/kaleido-gradle-plugin-0.1.0-dev.jar"
+plugin_jar="$repository_root/kaleido-gradle-plugin/build/libs/kaleido-gradle-plugin-$candidate_version.jar"
 device_spec="$repository_root/release/device-specs/pixel-api-36-arm64.json"
 sana_project="${KALEIDO_SANA_MATRIX_PROJECT:-}"
 sana_aab_relative="${KALEIDO_SANA_MATRIX_AAB:-app/build/outputs/bundle/release/app-release.aab}"
@@ -78,15 +83,15 @@ mkdir -p "$native_work"
 cp -R "$native_source/." "$native_work/"
 "$runtime_gradle" -p "$native_work" clean bundleRelease --stacktrace \
   -PmatrixPluginRepository="$plugin_repository" -PmatrixAgp="$runtime_agp" \
-  -PmatrixKaleido=0.1.0-dev
+  -PmatrixKaleido="$candidate_version"
 
-fixture_names=(java-safe kotlin-safe full-compose native-resource sample-app sana-reference)
+fixture_names=(java-safe kotlin-safe full-compose native-resource sample-comprehensive sana-reference)
 fixture_aabs=(
   "$matrix_work/java-safe/app/build/outputs/bundle/release/app-release.aab"
   "$matrix_work/kotlin-safe/app/build/outputs/bundle/release/app-release.aab"
   "$matrix_work/full-compose/app/build/outputs/bundle/release/app-release.aab"
   "$native_work/app/build/outputs/bundle/release/app-release.aab"
-  "$matrix_work/sample-app/app/build/outputs/bundle/release/app-release.aab"
+  "$matrix_work/sample-comprehensive/app/build/outputs/bundle/release/app-release.aab"
   "$sana_project/$sana_aab_relative"
 )
 fixture_packages=(
@@ -102,7 +107,7 @@ fixture_markers=(
   KALEIDO_PROBE_PASS
   KALEIDO_PROBE_PASS
   'KALEIDO_PROBE_PASS resource=resource-ok native=42'
-  KALEIDO_PROBE_PASS
+  KALEIDO_RESOURCE_PROBE_PASS
   "$sana_smoke_marker"
 )
 

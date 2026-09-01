@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/probe_surface"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/probe_screen_padding">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/probe_title"
+            android:textColor="@color/probe_text"
+            android:textSize="@dimen/probe_title_size"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/probe_spacing_small"
+            android:text="@string/probe_message"
+            android:textColor="@color/probe_text_secondary"
+            android:textSize="@dimen/probe_body_size" />
+
+        <GridLayout
+            android:id="@+id/icon_grid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/probe_spacing"
+            android:alignmentMode="alignMargins"
+            android:background="@drawable/probe_panel_background"
+            android:columnCount="3"
+            android:padding="@dimen/probe_spacing_small">
+
+            <ImageView
+                style="@style/ProbeIcon"
+                android:contentDescription="@string/icon_left_long"
+                android:src="@drawable/ic_arrow_left_long" />
+
+            <ImageView
+                style="@style/ProbeIcon"
+                android:contentDescription="@string/icon_left_long_duplicate"
+                android:src="@drawable/ic_arrow_left_long_duplicate" />
+
+            <ImageView
+                style="@style/ProbeIcon"
+                android:contentDescription="@string/icon_up_right_long"
+                android:src="@drawable/ic_arrow_up_right_long" />
+
+            <ImageView
+                style="@style/ProbeIcon"
+                android:contentDescription="@string/icon_up_right_long_duplicate"
+                android:src="@drawable/ic_arrow_up_right_long_duplicate" />
+
+            <ImageView
+                style="@style/ProbeIcon"
+                android:contentDescription="@string/icon_up_long"
+                android:src="@drawable/ic_arrow_up_long" />
+
+            <ImageView
+                style="@style/ProbeIcon"
+                android:contentDescription="@string/icon_up_long_compact"
+                android:src="@drawable/ic_arrow_up_long_compact" />
+
+            <ImageView
+                style="@style/ProbeIcon"
+                android:contentDescription="@string/icon_chevron_up"
+                android:src="@drawable/ic_chevron_up" />
+
+            <ImageView
+                style="@style/ProbeIcon"
+                android:contentDescription="@string/icon_right_circle"
+                android:src="@drawable/ic_arrow_right_circle" />
+
+            <ImageView
+                style="@style/ProbeIcon"
+                android:contentDescription="@string/icon_next_bar"
+                android:src="@drawable/ic_arrow_next_bar" />
+
+            <ImageView
+                style="@style/ProbeIcon"
+                android:contentDescription="@string/icon_chevron_left"
+                android:src="@drawable/ic_chevron_left" />
+
+            <ImageView
+                style="@style/ProbeIcon"
+                android:contentDescription="@string/icon_down_right"
+                android:src="@drawable/ic_arrow_down_right" />
+        </GridLayout>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/probe_spacing"
+            android:background="@drawable/probe_button_selector"
+            android:text="@string/selector_probe"
+            android:textColor="@color/probe_button_text"
+            android:textAllCaps="false" />
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_probe"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/probe_spacing" />
+
+        <TextView
+            android:id="@+id/probe_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/probe_spacing"
+            android:background="@drawable/probe_panel_background"
+            android:padding="@dimen/probe_spacing"
+            android:text="@string/status_pending"
+            android:textColor="@color/probe_text"
+            android:textIsSelectable="true"
+            android:textSize="@dimen/probe_body_size" />
+    </LinearLayout>
+</ScrollView>
