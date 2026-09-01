@@ -1,0 +1,14 @@
+Kaleido
+Copyright 2026 Kaleido contributors
+
+This product includes independently authored implementations of behavior
+associated with AndroidJunkCode and XmlClassGuard. No source code, generator
+templates, tests, or generated output from those projects is included.
+
+Kaleido's final-AAB resource transformation uses algorithmic concepts adapted
+from AabResGuard, copyright ByteDance Ltd. AabResGuard is licensed under the
+Apache License, Version 2.0. Kaleido's implementation is independently
+integrated with AGP 9 and materially changes planning, serialization,
+validation, signing, mapping, and evidence behavior.
+
+This NOTICE is informational and does not modify the Apache License, Version 2.0.

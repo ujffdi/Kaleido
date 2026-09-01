@@ -1,0 +1,6 @@
+schemaUri=https://schemas.tongsr.com/kaleido/artifact-report/0.9
+schemaVersion=0.9
+releaseEvidenceSetId=9999999999999999999999999999999999999999999999999999999999999999
+project=:legacy
+variant=legacyRelease
+legacyField=retained

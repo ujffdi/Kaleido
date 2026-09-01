@@ -1,0 +1,7 @@
+schemaUri=https://schemas.tongsr.com/kaleido/artifact-report/1.7
+schemaVersion=1.7
+releaseEvidenceSetId=1111111111111111111111111111111111111111111111111111111111111111
+project=:app
+variant=release
+applicationId=example.current
+additiveFutureField=preserved
