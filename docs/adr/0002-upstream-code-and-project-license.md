@@ -1,7 +1,0 @@
----
-status: accepted
----
-
-# Use a different integration strategy for each upstream engine
-
-Kaleido is an Apache-2.0 open-source project and owns its public DSL, Hardening Pipeline, Profiles, and reports. AndroidJunkCode behavior and source inform a Kaleido-owned independent implementation; the fixed 2.0.0 artifact is not a production dependency because it failed the reproducibility and cache-correctness gate, and compatible written permission is required before any source expression or template is copied. The upstream `2.0.0` Apache-2.0 publication metadata is retained as research provenance, but owner clarification is optional and does not gate independent implementation or public publication; absent clarification, Kaleido copies no upstream source expression, generator templates, or generated fragments. The Kaleido-owned Compose Generator remains independently authored even though it belongs to the AndroidJunkCode-equivalent capability family. Kaleido may reuse AabResGuard algorithms under Apache-2.0 with retained license, attribution, modification, and third-party provenance records while owning its Gradle/AGP integration. XmlClassGuard is used only as a behavioral reference: Kaleido independently implements the required class, Manifest, and XML behavior unless compatible written permission is later obtained. A generic engine SPI is not part of the MVP unless two real interchangeable adapters establish the seam.

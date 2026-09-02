@@ -1,3 +1,0 @@
-# Treat Kaleido as build hardening with a quiet runtime boundary
-
-Kaleido targets public Android teams, with Sana acting only as a Reference Consumer. Its product promise is reproducible, auditable Build Hardening through the normal Release AAB build; it does not promise review evasion. The default Safe Profile introduces no networking, data collection, permissions, background work, user-enterable components, or undisclosed user-visible behavior. A separately selected Full Profile may expose AndroidJunkCode Capability Parity, including component and Manifest generation, but every effect remains configurable and reported.
