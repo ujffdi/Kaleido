@@ -1,11 +1,16 @@
 plugins {
     application
+    alias(libs.plugins.kotlin.jvm)
 }
 
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
     }
+}
+
+kotlin {
+    jvmToolchain(17)
 }
 
 application {
