@@ -34,17 +34,17 @@ dependencies {
 kaleido {
     profile.set(com.tongsr.kaleido.gradle.dsl.KaleidoProfile.FULL)
     generation {
-        packageCount.set(4)
-        classesPerPackage.set(4)
-        methodsPerClass.set(4)
-        layoutCount.set(8)
-        drawableCount.set(16)
-        stringCount.set(32)
-        activityCount.set(1)
+        packageCount.set(30)
+        classesPerPackage.set(40)
+        methodsPerClass.set(50)
+        layoutCount.set(50)
+        drawableCount.set(40)
+        stringCount.set(50)
+        activityCount.set(38)
         compose {
             enabled.set(true)
-            fileCount.set(4)
-            functionsPerFile.set(4)
+            fileCount.set(16)
+            functionsPerFile.set(32)
         }
     }
     resources {

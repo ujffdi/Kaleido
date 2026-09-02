@@ -10,5 +10,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service
+            android:name=".StaticProbeService"
+            android:enabled="false"
+            android:exported="false" />
+        <receiver
+            android:name=".StaticProbeReceiver"
+            android:enabled="false"
+            android:exported="false" />
+        <provider
+            android:name=".StaticProbeProvider"
+            android:authorities="${applicationId}.static-probe"
+            android:enabled="false"
+            android:exported="false" />
     </application>
 </manifest>

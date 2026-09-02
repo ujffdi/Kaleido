@@ -45,7 +45,7 @@ internal object ComposeGenerationEngine {
                     .append("internal fun ").append(function.name)
                     .append("(value: Int): Int {\n")
                     .append("    var mixed = value xor 0x").append(constant).append(".toInt()\n")
-                if (globalIndex + 1 < total) {
+                if (functionIndex + 1 < functionsPerFile) {
                     source.append("    if ((mixed and 1) == 0) mixed = ")
                         .append(functions[globalIndex + 1].name)
                         .append("(mixed)\n")

@@ -34,13 +34,18 @@ class ComposeGenerationContractTest {
                 ),
             )
         }
-        for (index in 0 until first.functions.size - 1) {
+        for (index in first.functions.indices) {
             val current = first.functions[index]
-            val next = first.functions[index + 1]
             val source = first.kotlinFiles.values.first { value ->
                 value.contains("fun " + current.name + "(")
             }
-            assertTrue(source.contains("= " + next.name + "(mixed)"))
+            if ((index + 1) % 8 == 0) {
+                if (index + 1 < first.functions.size) {
+                    assertFalse(source.contains("= " + first.functions[index + 1].name + "(mixed)"))
+                }
+            } else {
+                assertTrue(source.contains("= " + first.functions[index + 1].name + "(mixed)"))
+            }
         }
     }
 
