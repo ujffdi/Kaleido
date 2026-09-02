@@ -1,5 +1,6 @@
 plugins {
     id("com.android.application")
+    id("com.getkeepsafe.dexcount")
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
