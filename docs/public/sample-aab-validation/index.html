@@ -1,0 +1,613 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Kaleido Sample 双 AAB 验证报告</title>
+  <style>
+    :root {
+      --page: #f3f6fb;
+      --surface: #ffffff;
+      --surface-soft: #f7f9fc;
+      --ink: #172033;
+      --muted: #5f6b80;
+      --line: #dce3ee;
+      --brand: #2854c5;
+      --brand-soft: #e9efff;
+      --success: #117747;
+      --success-soft: #e5f7ee;
+      --neutral: #52627a;
+      --neutral-soft: #edf1f6;
+      --warning: #8a5600;
+      --warning-soft: #fff4d8;
+      --code: #172033;
+      --code-ink: #e8eefc;
+      --shadow: 0 18px 50px rgba(24, 42, 79, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--page);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+        "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      font-size: 16px;
+      line-height: 1.72;
+    }
+    a { color: var(--brand); text-underline-offset: 3px; }
+    a:hover { text-decoration-thickness: 2px; }
+    code {
+      padding: 0.12rem 0.36rem;
+      border: 1px solid #e0e5ee;
+      border-radius: 5px;
+      background: #f2f4f8;
+      color: #293550;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 0.88em;
+      overflow-wrap: anywhere;
+    }
+    pre {
+      margin: 14px 0 0;
+      padding: 18px 20px;
+      overflow: auto;
+      border-radius: 12px;
+      background: var(--code);
+      color: var(--code-ink);
+      font: 0.82rem/1.65 "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+    pre code { padding: 0; border: 0; background: transparent; color: inherit; font-size: inherit; }
+    .page { width: min(1180px, calc(100% - 32px)); margin: 32px auto 64px; }
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 48px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, #172b5f 0%, #2854c5 58%, #5d7de2 100%);
+      box-shadow: var(--shadow);
+      color: #fff;
+    }
+    .hero::after {
+      position: absolute;
+      right: -90px;
+      bottom: -140px;
+      width: 340px;
+      height: 340px;
+      border: 58px solid rgba(255, 255, 255, 0.08);
+      border-radius: 50%;
+      content: "";
+    }
+    .eyebrow {
+      margin: 0 0 10px;
+      color: #cbd8ff;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    h1 {
+      position: relative;
+      z-index: 1;
+      margin: 0;
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      line-height: 1.14;
+      letter-spacing: -0.03em;
+    }
+    .hero-summary {
+      position: relative;
+      z-index: 1;
+      max-width: 820px;
+      margin: 18px 0 0;
+      color: #edf2ff;
+      font-size: 1.06rem;
+    }
+    .meta {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 22px;
+      margin-top: 28px;
+      color: #d7e1ff;
+      font-size: 0.9rem;
+    }
+    .verdict-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      margin: 22px 0;
+    }
+    .verdict, .panel {
+      border: 1px solid var(--line);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+    .verdict { padding: 24px; border-radius: 18px; }
+    .verdict.plugin { border-color: #b9e3cc; }
+    .verdict-label {
+      margin: 0 0 7px;
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .verdict h2 { margin: 0 0 8px; font-size: 1.28rem; line-height: 1.35; }
+    .verdict-result, .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 0.86rem;
+      font-weight: 750;
+    }
+    .verdict-result { margin-top: 8px; background: var(--neutral-soft); color: var(--neutral); }
+    .plugin .verdict-result, .badge { background: var(--success-soft); color: var(--success); }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+    .artifact-link { display: inline-block; margin-top: 14px; font-weight: 650; }
+    .panel { margin-top: 22px; padding: 32px; border-radius: 20px; }
+    .panel h2 { margin: 0 0 16px; font-size: 1.55rem; line-height: 1.3; letter-spacing: -0.015em; }
+    .panel h3 { margin: 26px 0 10px; font-size: 1.08rem; }
+    .panel p:first-of-type { margin-top: 0; }
+    .callout {
+      margin: 20px 0 0;
+      padding: 16px 18px;
+      border-left: 4px solid var(--warning);
+      border-radius: 8px;
+      background: var(--warning-soft);
+      color: #61420b;
+    }
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin: 18px 0 4px;
+    }
+    .stat { padding: 17px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-soft); }
+    .stat strong { display: block; color: var(--brand); font-size: 1.45rem; line-height: 1.2; }
+    .stat span { color: var(--muted); font-size: 0.82rem; }
+    .table-wrap { width: 100%; margin-top: 14px; overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+    table { width: 100%; border-collapse: collapse; background: var(--surface); font-size: 0.9rem; }
+    th, td { padding: 13px 15px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { background: var(--surface-soft); color: #3d4960; font-size: 0.82rem; letter-spacing: 0.025em; }
+    tr:last-child td { border-bottom: 0; }
+    .pass { color: var(--success); font-weight: 750; white-space: nowrap; }
+    .hash { min-width: 380px; font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.8rem; overflow-wrap: anywhere; }
+    .evidence { border-top: 4px solid var(--brand); }
+    .evidence-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 16px; }
+    .evidence-head h2 { margin-bottom: 0; }
+    .number { display: block; margin-bottom: 5px; color: var(--brand); font-size: 0.76rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin: 18px 0;
+    }
+    .step { position: relative; padding: 15px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-soft); }
+    .step strong { display: block; margin-bottom: 4px; color: var(--brand); font-size: 0.84rem; }
+    .source { margin-top: 18px; color: var(--muted); font-size: 0.84rem; }
+    details { margin-top: 14px; padding: 12px 15px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-soft); }
+    summary { cursor: pointer; color: var(--brand); font-weight: 700; }
+    ul, ol { padding-left: 1.35rem; }
+    li + li { margin-top: 8px; }
+    .footer { padding: 25px 4px 0; color: var(--muted); font-size: 0.86rem; text-align: center; }
+
+    @media (max-width: 820px) {
+      .hero { padding: 34px 26px; }
+      .verdict-grid, .flow { grid-template-columns: 1fr; }
+      .panel { padding: 24px 20px; }
+      .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .evidence-head { display: block; }
+      .badge { margin-top: 10px; }
+      .table-wrap table { min-width: 720px; }
+    }
+    @media (max-width: 480px) {
+      .page { width: min(1180px, calc(100% - 20px)); margin-top: 10px; }
+      .hero { border-radius: 16px; }
+      .panel, .verdict { border-radius: 14px; }
+      .stat-grid { grid-template-columns: 1fr; }
+    }
+    @media print {
+      body { background: #fff; font-size: 10pt; }
+      .page { width: 100%; margin: 0; }
+      .hero, .panel, .verdict { box-shadow: none; break-inside: avoid; }
+      .hero { background: #244a9e !important; print-color-adjust: exact; }
+      .panel { margin-top: 12px; }
+      pre { white-space: pre-wrap; }
+      a { color: inherit; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="hero">
+      <p class="eyebrow">Kaleido · Release AAB Evidence</p>
+      <h1>Sample 双 AAB 验证报告</h1>
+      <p class="hero-summary">
+        对共享同一份 Sample 源码的 baseline AAB 与 Kaleido FULL 插件 AAB 做最终产物级交叉验证。
+        每项能力均给出 before / mapping / after 原始数据，而不只给出汇总结论。
+      </p>
+      <div class="meta">
+        <span>验证日期：2026-09-02</span>
+        <span>macOS arm64 · JDK 17</span>
+        <span>Gradle 9.4.1 · Build Tools 36.0.0</span>
+        <span>插件：0.1.0-dev</span>
+      </div>
+    </header>
+
+    <section class="verdict-grid" aria-label="最终结论">
+      <article class="verdict">
+        <p class="verdict-label">Baseline</p>
+        <h2>未应用 Kaleido</h2>
+        <p>共享 Sample <code>src/main</code>，保留源码类名、资源和待删除条目，作为有效差异基线。</p>
+        <span class="verdict-result"><span class="dot"></span>有效对照：插件未运行</span><br>
+        <a class="artifact-link" href="https://github.com/ujffdi/Kaleido/releases/download/sample-aab-validation-2026-09-02/baseline-without-plugin.aab">下载 baseline-without-plugin.aab</a>
+      </article>
+      <article class="verdict plugin">
+        <p class="verdict-label">Plugin enabled</p>
+        <h2>Kaleido FULL 插件 AAB</h2>
+        <p>生成、类/XML 同步改名、资源处理、R8、签名与发布证据均在最终产物闭环。</p>
+        <span class="verdict-result"><span class="dot"></span>Kaleido 已运行且有效</span><br>
+        <a class="artifact-link" href="https://github.com/ujffdi/Kaleido/releases/download/sample-aab-validation-2026-09-02/plugin-enabled.aab">下载 plugin-enabled.aab</a>
+      </article>
+    </section>
+
+    <section class="panel">
+      <h2>判定方法与证明边界</h2>
+      <p>
+        每张证据卡按 <strong>Baseline 最终状态 → Kaleido 转换计划/映射 → 插件 AAB 最终状态</strong> 展示。
+        证据来自最终 Manifest、资源表、编译 XML、全部 DEX、ZIP 条目、raw/composed mapping、签名回执、
+        固定设备 APK Set 和 Dexcount；AAB 大小只作为量化指标，不单独决定插件是否有效。
+      </p>
+      <div class="callout">
+        本报告属于静态产物与可控构建证据。未安装或启动 APK，因此不声称设备运行、全部运行时路径、所有设备、
+        Google Play 审核或商店接受性已经验证。
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>产物身份</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>产物</th><th>SHA-256</th><th>字节数</th><th>状态</th></tr></thead>
+          <tbody>
+            <tr><td><a href="https://github.com/ujffdi/Kaleido/releases/download/sample-aab-validation-2026-09-02/baseline-without-plugin.aab">baseline-without-plugin.aab</a></td><td class="hash">77a2dd9311ed17a886dce489fb41a4899b428fdc8c8a82fd2ef4ca6837087c09</td><td>1,886,380</td><td>结构有效；未签名对照</td></tr>
+            <tr><td><a href="https://github.com/ujffdi/Kaleido/releases/download/sample-aab-validation-2026-09-02/plugin-enabled.aab">plugin-enabled.aab</a></td><td class="hash">935fd1e9fae270af17a90ba23a76bc1cc867a62e0561da7f3583fbb1d9c4c8c8</td><td>3,431,428</td><td>结构与签名有效</td></tr>
+            <tr><td><a href="https://github.com/ujffdi/Kaleido/releases/download/sample-aab-validation-2026-09-02/baseline.apks">baseline.apks</a></td><td class="hash">17107ba4c7b6e3421ed3260211246af5a994e0c1ba76fd747f520a824974d9dc</td><td>1,395,018</td><td>固定设备规格生成成功</td></tr>
+            <tr><td><a href="https://github.com/ujffdi/Kaleido/releases/download/sample-aab-validation-2026-09-02/plugin-enabled.apks">plugin-enabled.apks</a></td><td class="hash">6314fe23eb2365a8c342a78a5b38fa060e3930eb5fdf4e969c03b63eaff22b9c</td><td>4,805,619</td><td>固定设备规格生成成功</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>核心能力总览</h2>
+      <div class="stat-grid">
+        <div class="stat"><strong>1,254</strong><span>生成 Kotlin 文件</span></div>
+        <div class="stat"><strong>60,000</strong><span>生成普通方法</span></div>
+        <div class="stat"><strong>512</strong><span>Compose 函数</span></div>
+        <div class="stat"><strong>10 / 10</strong><span>Evidence stages PASS</span></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>能力</th><th>关键证据</th><th>判定</th></tr></thead>
+          <tbody>
+            <tr><td>代码与资源生成</td><td>1,238 个普通/Activity 类、50 layout、40 drawable、50 string、38 Activity、512 Compose 函数</td><td class="pass">通过</td></tr>
+            <tr><td>类名与引用同步</td><td>四类组件和自定义 View 的 mapping → Manifest/XML → DEX 闭环；保护类原身份保留</td><td class="pass">通过</td></tr>
+            <tr><td>最终 AAB 资源处理</td><td>资源改名/改路径、去重、删除、语言过滤、保护项稳定均命中最终 AAB</td><td class="pass">通过</td></tr>
+            <tr><td>确定性 R8</td><td>三份 4,096 项字典、raw/composed mapping；两次未签名 AAB 与证据哈希相同</td><td class="pass">通过</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="source">
+        Release Evidence Set：<code>stage.01</code> 至 <code>stage.10</code> 全部 PASS，
+        <code>diagnostics.count=0</code>，<code>publicationResult=PUBLISHED</code>。
+        <a href="evidence/">查看在线证据目录</a>。
+      </p>
+    </section>
+
+    <section class="panel evidence">
+      <div class="evidence-head"><div><span class="number">Evidence 01</span><h2>普通代码、资源与 Activity 生成</h2></div><span class="badge">通过</span></div>
+      <div class="flow">
+        <div class="step"><strong>Baseline</strong>无 Kaleido 生成清单、生成命名空间或 38 个生成 Activity。</div>
+        <div class="step"><strong>生成计划</strong>30 package × 40 class × 50 method；38 Activity；50/40/50 资源。</div>
+        <div class="step"><strong>最终产物</strong>1,254 Kotlin 文件；38 个生成 Activity 全进入 Manifest；生成类进入 DEX。</div>
+      </div>
+      <pre><code>generation.packageCount=30
+generation.classesPerPackage=40
+generation.methodsPerClass=50
+generation.activityCount=38
+generation.layoutCount=50
+generation.drawableCount=40
+generation.stringCount=50
+
+classes=1238
+methods=60000
+components.activities=38</code></pre>
+      <h3>具体样例</h3>
+      <pre><code>生成名：...components.A_020f9b7a6a32
+Kaleido mapping：...components.k14ee8c.C14ee8cbfa7
+最终 Manifest：&lt;activity android:exported="false"
+  android:name="...components.k14ee8c.C14ee8cbfa7"/&gt;
+最终 DEX：新描述符存在</code></pre>
+      <p>1,254 个 Kotlin 文件可分解为 1,200 普通类、38 Activity 和 16 Compose facade；生成内容并非只停留在中间目录。</p>
+      <p class="source">证据：<a href="evidence/generated-inventory.properties">generated-inventory.properties</a> · <a href="evidence/raw-kaleido-mapping.txt">raw-kaleido-mapping.txt</a></p>
+    </section>
+
+    <section class="panel evidence">
+      <div class="evidence-head"><div><span class="number">Evidence 02</span><h2>四类 Android 组件的类名同步</h2></div><span class="badge">通过</span></div>
+      <p>目标是保证系统从 Manifest 实例化组件时，声明名称与最终 DEX 类定义完全一致。</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>类型</th><th>Baseline 最终名</th><th>插件最终名</th><th>最终 DEX</th></tr></thead>
+          <tbody>
+            <tr><td>Activity</td><td><code>MainActivity</code></td><td><code>k0fdd3c.C0fdd3c6f42</code></td><td>新类 1，旧类 0</td></tr>
+            <tr><td>Service</td><td><code>StaticProbeService</code></td><td><code>k74f8f2.C74f8f267e8</code></td><td>新类 1，旧类 0</td></tr>
+            <tr><td>Receiver</td><td><code>StaticProbeReceiver</code></td><td><code>kf11dba.Cf11dba09ef</code></td><td>新类 1，旧类 0</td></tr>
+            <tr><td>Provider</td><td><code>StaticProbeProvider</code></td><td><code>kd0bf18.Cd0bf18f520</code></td><td>新类 1，旧类 0</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <details open>
+        <summary>raw Kaleido mapping</summary>
+        <pre><code>MainActivity -&gt; k0fdd3c.C0fdd3c6f42
+StaticProbeProvider -&gt; kd0bf18.Cd0bf18f520
+StaticProbeReceiver -&gt; kf11dba.Cf11dba09ef
+StaticProbeService -&gt; k74f8f2.C74f8f267e8</code></pre>
+      </details>
+      <details>
+        <summary>最终 Manifest 片段</summary>
+        <pre><code>&lt;activity android:exported="true" android:name="...k0fdd3c.C0fdd3c6f42"&gt;
+&lt;service android:enabled="false" android:exported="false" android:name="...k74f8f2.C74f8f267e8"/&gt;
+&lt;receiver android:enabled="false" android:exported="false" android:name="...kf11dba.Cf11dba09ef"/&gt;
+&lt;provider android:authorities="com.tongsr.kaleido.sample.static-probe"
+  android:name="...kd0bf18.Cd0bf18f520"/&gt;</code></pre>
+      </details>
+      <p>Provider 的业务 authority 保持不变。四项均由 mapping、Manifest 和 DEX 三方确认。</p>
+      <p class="source">证据：<a href="evidence/manifest-rewrite-intent.properties">manifest-rewrite-intent.properties</a> · <a href="evidence/plugin-dex-proof.txt">plugin DEX 精选证明</a></p>
+    </section>
+
+    <section class="panel evidence">
+      <div class="evidence-head"><div><span class="number">Evidence 03</span><h2>编译 XML 中的自定义 View 同步改名</h2></div><span class="badge">通过</span></div>
+      <div class="flow">
+        <div class="step"><strong>Baseline 编译 XML</strong><code>StaticProbeView</code></div>
+        <div class="step"><strong>XML Rewrite Intent</strong><code>StaticProbeView → kf77a70.Cf77a70ae59</code></div>
+        <div class="step"><strong>插件 XML + DEX</strong>编译 XML 命中新名；DEX 新类 1、旧类 0。</div>
+      </div>
+      <pre><code># Baseline：aapt2 dump xmltree
+E: com.tongsr.kaleido.sample.StaticProbeView (line=9)
+
+# Kaleido 转换计划
+mapping=...StaticProbeView|...kf77a70.Cf77a70ae59
+site=layout/protected_probe_layout.xml/element[1]|...StaticProbeView|...kf77a70.Cf77a70ae59
+
+# 插件包派生 APK：aapt2 dump xmltree
+E: com.tongsr.kaleido.sample.kf77a70.Cf77a70ae59 (line=3)</code></pre>
+      <p><strong>结论：</strong>XML 从名字 <code>StaticProbeView</code> 改为 <code>kf77a70.Cf77a70ae59</code>，计划、编译 XML 与最终 DEX 完全一致。</p>
+      <p class="source">证据：<a href="evidence/xml-rewrite-intent.properties">xml-rewrite-intent.properties</a> · <a href="https://github.com/ujffdi/Kaleido/releases/download/sample-aab-validation-2026-09-02/baseline-base-master.apk">baseline APK</a> · <a href="https://github.com/ujffdi/Kaleido/releases/download/sample-aab-validation-2026-09-02/plugin-base-master.apk">plugin APK</a></p>
+    </section>
+
+    <section class="panel evidence">
+      <div class="evidence-head"><div><span class="number">Evidence 04</span><h2>资源名与文件路径改写</h2></div><span class="badge">通过</span></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>资源 ID</th><th>Baseline</th><th>插件最终名称</th><th>文件路径</th></tr></thead>
+          <tbody>
+            <tr><td><code>0x7f070000</code></td><td><code>layout/activity_main</code></td><td><code>layout/kc472b50c80</code></td><td><code>activity_main.xml → kc472b50c80.xml</code></td></tr>
+            <tr><td><code>0x7f090003</code></td><td><code>string/app_name</code></td><td><code>string/kf08c6e23af</code></td><td>values entry</td></tr>
+            <tr><td><code>0x7f0a0000</code></td><td><code>style/AppTheme</code></td><td><code>style/k1bad403e37</code></td><td>values entry</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <pre><code>resource=0x7f070000|...:layout/activity_main -&gt; ...:layout/kc472b50c80
+path=base/res/layout/activity_main.xml -&gt; base/res/layout/kc472b50c80.xml
+resource=0x7f090003|...:string/app_name -&gt; ...:string/kf08c6e23af
+resource=0x7f0a0000|...:style/AppTheme -&gt; ...:style/k1bad403e37</code></pre>
+      <p>最终 ZIP 只存在 <code>base/res/layout/kc472b50c80.xml</code>，资源表按同一 ID 命中新名称。ID 保持指插件包 rewrite 输入到输出的边界，不表示加入生成资源后 baseline 与插件包的所有 ID 都相同。</p>
+      <p class="source">证据：<a href="evidence/resource-mapping.txt">resource-mapping.txt</a> · <a href="https://github.com/ujffdi/Kaleido/releases/download/sample-aab-validation-2026-09-02/plugin-enabled.aab">plugin-enabled.aab</a></p>
+    </section>
+
+    <section class="panel evidence">
+      <div class="evidence-head"><div><span class="number">Evidence 05</span><h2>重复 drawable 的物理去重</h2></div><span class="badge">通过</span></div>
+      <p>两个资源身份和 ID 继续存在，但内容相同的 file-backed payload 指向同一物理 XML。</p>
+      <pre><code>0x7f040001 ic_arrow_left_long
+  -&gt; drawable/k8429b21c4a
+  -&gt; base/res/drawable/k8429b21c4a.xml
+
+0x7f040002 ic_arrow_left_long_duplicate
+  -&gt; drawable/kaaf2d9f046
+  -&gt; base/res/drawable/k8429b21c4a.xml</code></pre>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>重复组</th><th>Baseline 物理文件</th><th>插件物理文件</th><th>插件资源 entry</th></tr></thead>
+          <tbody>
+            <tr><td>left_long</td><td>2</td><td>1：<code>k8429b21c4a.xml</code></td><td>2</td></tr>
+            <tr><td>up_right_long</td><td>2</td><td>1：<code>k50238a4eb7.xml</code></td><td>2</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p><strong>结论：</strong>去重的是文件 payload，不是资源 ID；两个调用方身份没有被合并。</p>
+    </section>
+
+    <section class="panel evidence">
+      <div class="evidence-head"><div><span class="number">Evidence 06</span><h2>删除、unused string 与语言过滤</h2></div><span class="badge">通过</span></div>
+      <pre><code>resources.nativeLibrariesToDelete=libobsolete.so
+resources.metadataToDelete=META-INF/DEPENDENCIES
+resources.replaceUnusedStrings=true
+resources.confirmedUnusedStrings=confirmed_unused_label
+resources.retainedLanguages=zh-CN</code></pre>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>目标</th><th>Baseline AAB</th><th>插件 AAB</th><th>结论</th></tr></thead>
+          <tbody>
+            <tr><td><code>libobsolete.so</code></td><td>存在，42 bytes</td><td>不存在</td><td class="pass">删除命中</td></tr>
+            <tr><td><code>META-INF/DEPENDENCIES</code></td><td>存在，54 bytes</td><td>不存在</td><td class="pass">删除命中</td></tr>
+            <tr><td><code>libkeep.so</code></td><td>存在，39 bytes</td><td>存在，39 bytes</td><td class="pass">非目标保留</td></tr>
+            <tr><td><code>confirmed_unused_label</code></td><td>资源表存在</td><td>0 命中</td><td class="pass">unused 删除</td></tr>
+            <tr><td><code>locale_probe</code></td><td>default / fr / zh-CN</td><td>default / zh-CN；fr 0 命中</td><td class="pass">语言过滤</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p><code>confirmed_unused_label</code> 可在 rewrite 输入 mapping 中枚举、但最终资源表不存在，证明后续 confirmed-unused 删除完成；同时用 <code>libkeep.so</code> 证明未误删非目标。</p>
+    </section>
+
+    <section class="panel evidence">
+      <div class="evidence-head"><div><span class="number">Evidence 07</span><h2>保护规则与 Escape Hatch</h2></div><span class="badge">通过</span></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>保护目标</th><th>来源</th><th>最终证据</th></tr></thead>
+          <tbody>
+            <tr><td><code>string/sample_status</code></td><td>资源名保护声明</td><td>插件最终资源表仍叫 <code>sample_status</code></td></tr>
+            <tr><td><code>layout/protected_probe_layout</code></td><td><code>PACKAGED_PATH+RESOURCE_NAME</code></td><td>名称和 <code>base/res/layout/protected_probe_layout.xml</code> 均不变</td></tr>
+            <tr><td><code>string/runtime_label</code></td><td>字节码发现精确 <code>getIdentifier</code></td><td>插件最终资源表仍叫 <code>runtime_label</code></td></tr>
+            <tr><td><code>RuntimeProtectedEntry</code></td><td>原身份、可达性、运行时属性保护</td><td>baseline 被 R8 移除；插件 DEX 原描述符类定义 1</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <pre><code>-keep,allowoptimization class com.tongsr.kaleido.sample.RuntimeProtectedEntry { *; }
+
+com.tongsr.kaleido.sample.RuntimeProtectedEntry
+  -&gt; com.tongsr.kaleido.sample.RuntimeProtectedEntry:</code></pre>
+      <p><strong>结论：</strong>保护功能不只是不改名；它还使 baseline 中会被普通 R8 删除的运行时入口保留在插件最终 DEX。</p>
+      <p class="source">证据：<a href="evidence/adoption-plan.properties">adoption-plan.properties</a> · <a href="evidence/protection.keep">protection.keep</a></p>
+    </section>
+
+    <section class="panel evidence">
+      <div class="evidence-head"><div><span class="number">Evidence 08</span><h2>Compose 生成、编译与最终保留</h2></div><span class="badge">通过</span></div>
+      <div class="stat-grid">
+        <div class="stat"><strong>16</strong><span>JVM facade</span></div>
+        <div class="stat"><strong>512</strong><span>Compose functions</span></div>
+        <div class="stat"><strong>0</strong><span>普通字节码入边</span></div>
+        <div class="stat"><strong>2</strong><span>最终 DEX 文件</span></div>
+      </div>
+      <pre><code>generation.compose.enabled=true
+generation.compose.fileCount=16
+generation.compose.functionsPerFile=32
+
+facades=16
+functions=512
+dexFiles=2
+mappingResolved=true
+incomingBytecodeEdges=0
+finalDexRetained=true</code></pre>
+      <h3>具体 facade 与 lowering 样例</h3>
+      <pre><code>KldCompose_02e7b7359eea
+  -&gt; ...generated.compose.kbb68d0.Cbb68d0ad82
+
+kld_6e3cbb95ecdb|(ILandroidx/compose/runtime/Composer;I)I</code></pre>
+      <p>原 <code>44 × 33</code> 配置越界，已改为 <code>16 × 32 = 512</code>；同时修复跨文件深度 512 调用链导致的 Compose compiler <code>StackOverflowError</code>，最大路径深度降为 32。回执确认 mapping 全解析并保留在最终 DEX。</p>
+      <div class="callout"><code>incomingBytecodeEdges=0</code> 证明没有普通静态业务入边，不等于对反射、JNI 或下载代码的绝对不可达证明。</div>
+      <p class="source">证据：<a href="evidence/compose-compiled-inventory.properties">compose-compiled-inventory.properties</a> · <a href="evidence/compose-final-dex-receipt.properties">compose-final-dex-receipt.properties</a></p>
+    </section>
+
+    <section class="panel evidence">
+      <div class="evidence-head"><div><span class="number">Evidence 09</span><h2>确定性 R8 字典与 composed mapping</h2></div><span class="badge">通过</span></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>字典</th><th>数据项</th><th>首个 token</th><th>SHA-256</th></tr></thead>
+          <tbody>
+            <tr><td>class</td><td>4,096</td><td><code>C00042dffdc</code></td><td class="hash">f6751844d8ccfa2b2ffb152a6e023f2be44dc1970187fb1462994aacbb4a0bd2</td></tr>
+            <tr><td>member</td><td>4,096</td><td><code>m001f12ea9c</code></td><td class="hash">af6d413e886b13be94705ab876caf1906e81757691cef9f4f22e066297d20cea</td></tr>
+            <tr><td>package</td><td>4,096</td><td><code>p000665a366</code></td><td class="hash">5c8a2cf08a8acf6fcaae2f461188709ee857aa7b6597b583b45ad8e5016b3116</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <pre><code>原始生成类：...generated.p_0990225c.C_b8de81286c
+raw Kaleido：...generated.p_0990225c.k04a1ee.C04a1ee4378
+raw R8：     C0eb5829e95
+composed：原始生成类 -&gt; C0eb5829e95
+
+-obfuscationdictionary ../dictionaries/member.txt
+-classobfuscationdictionary ../dictionaries/class.txt
+-packageobfuscationdictionary ../dictionaries/package.txt</code></pre>
+      <p><strong>结论：</strong>三份字典被实际接入 R8；raw Kaleido、raw R8 与 composed mapping 对同一个类给出一致的两段和直达关系。</p>
+    </section>
+
+    <section class="panel evidence">
+      <div class="evidence-head"><div><span class="number">Evidence 10</span><h2>Dexcount 4.0.0 量化</h2></div><span class="badge">通过</span></div>
+      <p>baseline 与插件模块均应用 KeepSafe Dexcount 4.0.0，直接统计两个 release AAB；其 DEX SHA-256 与本报告下载的 AAB 完全一致。</p>
+      <pre><code>./gradlew :baseline:countReleaseBundleDexMethods :app:countReleaseBundleDexMethods</code></pre>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>指标</th><th>Baseline</th><th>Kaleido</th><th>净增量</th><th>增幅</th><th>倍率</th></tr></thead>
+          <tbody>
+            <tr><td>方法引用</td><td>8,591</td><td>70,431</td><td>+61,840</td><td>+719.82%</td><td>8.20×</td></tr>
+            <tr><td>字段指标</td><td>4,364</td><td>5,634</td><td>+1,270</td><td>+29.10%</td><td>1.29×</td></tr>
+            <tr><td>类指标</td><td>1,604</td><td>2,873</td><td>+1,269</td><td>+79.11%</td><td>1.79×</td></tr>
+            <tr><td>DEX 文件</td><td>1</td><td>2</td><td>+1</td><td>+100%</td><td>2.00×</td></tr>
+            <tr><td>AAB 字节数</td><td>1,886,380</td><td>3,431,428</td><td>+1,545,048</td><td>+81.91%</td><td>1.82×</td></tr>
+            <tr><td>固定设备 APK Set</td><td>1,395,018</td><td>4,805,619</td><td>+3,410,601</td><td>+244.48%</td><td>3.44×</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <pre><code>61750  com.tongsr.kaleido.sample.kaleido.generated
+38     com.tongsr.kaleido.sample.kaleido.generated.components
+512    com.tongsr.kaleido.sample.kaleido.generated.compose
+
+1,200 × (50 方法 + 1 构造) = 61,200
+38 Activity × 1 构造       =     38
+512 Compose 函数           =    512
+合计                        = 61,750</code></pre>
+      <p>61,750 占方法净增量 61,840 的 <strong>99.85%</strong>。Dexcount 的 <code>107.47% used</code> 是跨两个 DEX 与单 DEX 阈值的展示性比较，不表示已成功生成两个 DEX 的 AAB 构建失败。</p>
+      <div class="callout">Dexcount 不测量资源、native、下载体积、启动耗时或运行时内存；这些不能从方法数推断。</div>
+      <p class="source">原始输出：<a href="evidence/dexcount/baseline-release.txt">baseline release.txt</a> · <a href="evidence/dexcount/plugin-release.txt">plugin release.txt</a> · <a href="https://keepsafe.github.io/dexcount-gradle-plugin/">官方文档</a></p>
+    </section>
+
+    <section class="panel evidence">
+      <div class="evidence-head"><div><span class="number">Evidence 11</span><h2>签名、结构与可重复性</h2></div><span class="badge">通过</span></div>
+      <pre><code>unsignedAabSha256=1291547ffcbeabf6ffe402dd36c0e6fe5ebeb84eaa93cc73251695efd55e3af7
+signedAabSha256=935fd1e9fae270af17a90ba23a76bc1cc867a62e0561da7f3583fbb1d9c4c8c8
+certificateSha256=2aab083453565aca922c100e7001a520027b55af50afa05c3ec2e6c2f262c5b6
+signatureCoverageValidated=true
+certificateMatched=true
+bundletoolValidated=true</code></pre>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>确定性边界文件</th><th>第一次</th><th>第二次</th><th>结果</th></tr></thead>
+          <tbody>
+            <tr><td>unsigned-candidate.aab</td><td><code>1291547f…e3af7</code></td><td><code>1291547f…e3af7</code></td><td class="pass">相同</td></tr>
+            <tr><td>deterministic evidence</td><td><code>15f47961…768b0</code></td><td><code>15f47961…768b0</code></td><td class="pass">相同</td></tr>
+            <tr><td>raw Kaleido mapping</td><td><code>476dc3c9…96a1</code></td><td><code>476dc3c9…96a1</code></td><td class="pass">相同</td></tr>
+            <tr><td>raw R8 mapping</td><td><code>41ea8821…0bc3</code></td><td><code>41ea8821…0bc3</code></td><td class="pass">相同</td></tr>
+            <tr><td>composed mapping</td><td><code>0dcb4540…297e</code></td><td><code>0dcb4540…297e</code></td><td class="pass">相同</td></tr>
+            <tr><td>resource mapping</td><td><code>01c2ab7f…40ca</code></td><td><code>01c2ab7f…40ca</code></td><td class="pass">相同</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>最终签名 AAB 可因 JAR 签名元数据产生字节差异；Kaleido 的确定性承诺边界是未签名候选、生成内容、计划、字典和映射。每次 Evidence Set 都把签名 AAB 绑定到同一个未签名 digest 与证书。</p>
+      <p class="source">证据：<a href="evidence/signing-receipt.properties">signing-receipt.properties</a> · <a href="evidence/release-evidence-set-manifest.properties">release-evidence-set-manifest.properties</a></p>
+    </section>
+
+    <section class="panel">
+      <h2>已执行验证</h2>
+      <ol>
+        <li><code>:kaleido-gradle-plugin:test</code> 通过，包含 Compose 调用深度回归契约。</li>
+        <li>关闭 Build Cache 的 baseline + plugin 干净 release AAB 联合构建通过，共 110 个任务。</li>
+        <li>第二次关闭 Build Cache 的 plugin 干净构建通过，验证确定性边界复现。</li>
+        <li>bundletool 对两份 AAB 的结构校验和固定设备规格 APK Set 生成通过。</li>
+        <li><code>bundletool dump</code>、<code>aapt2 dump xmltree</code>、<code>dexdump</code>、ZIP、mapping 和 Evidence Set 交叉检查通过。</li>
+        <li><code>jarsigner -verify</code> 确认插件 AAB 完整签名；baseline 确认为未签名对照。</li>
+        <li>Dexcount 两模块 AAB 任务通过，输入 DEX 哈希与报告 AAB 完全一致。</li>
+      </ol>
+    </section>
+
+    <section class="panel">
+      <h2>总判定与限制</h2>
+      <ul>
+        <li><strong>baseline-without-plugin.aab：有效对照，未运行 Kaleido。</strong> 类名、XML、资源、待删除条目和单 DEX 规模符合未应用插件的预期。</li>
+        <li><strong>plugin-enabled.aab：Kaleido 有效。</strong> 四项核心能力和各功能点均有具体 before/after 数据，并由最终 AAB 或其固定设备 APK Set 反向确认。</li>
+        <li><strong>尚未验证：设备运行行为。</strong> 启动、资源加载、组件实例化和交互路径应由真机人工测试补充。</li>
+      </ul>
+      <p>本次验证直接使用 AAB 的 ZIP、protobuf、DEX、mapping 和 Kaleido Release Evidence Set，形成可重复的产物证据链。</p>
+      <p><a href="kaleido-sample-aab-validation.md">查看 Markdown 详细报告</a></p>
+    </section>
+
+    <footer class="footer">Kaleido Sample AAB Validation · Detailed static and controlled-build evidence</footer>
+  </main>
+</body>
+</html>

@@ -1,0 +1,3 @@
+# Kaleido Protection Requirements v1
+-keep,allowoptimization class com.tongsr.kaleido.sample.RuntimeProtectedEntry { *; }
+-keepattributes RuntimeVisibleAnnotations,RuntimeInvisibleAnnotations,AnnotationDefault,Signature,InnerClasses,EnclosingMethod

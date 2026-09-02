@@ -1,0 +1,74 @@
+Kaleido Sample plugin DEX proof
+================================
+
+Scope
+-----
+
+This is a curated proof extracted from the complete plugin DEX dump. It records
+only the class descriptors needed by the report. The complete compressed dump is
+published as plugin-dexdump.txt.gz in the GitHub prerelease.
+
+Input DEX SHA-256
+-----------------
+
+cad4906896230ac1f713473d0a96f2606c6c48b592fca76e55ffe20c069bd22e  classes.dex
+f5c489e0c2dd2b3e73eb05fa9f2ca1e4a1c512afe6c051d6ccaaefe9e81b3118  classes2.dex
+
+Exact class descriptor definition counts
+----------------------------------------
+
+original descriptor                                                   count
+Lcom/tongsr/kaleido/sample/MainActivity;                              0
+Lcom/tongsr/kaleido/sample/StaticProbeService;                        0
+Lcom/tongsr/kaleido/sample/StaticProbeReceiver;                       0
+Lcom/tongsr/kaleido/sample/StaticProbeProvider;                       0
+Lcom/tongsr/kaleido/sample/StaticProbeView;                           0
+
+final descriptor                                                      count
+Lcom/tongsr/kaleido/sample/k0fdd3c/C0fdd3c6f42;                      1
+Lcom/tongsr/kaleido/sample/k74f8f2/C74f8f267e8;                      1
+Lcom/tongsr/kaleido/sample/kf11dba/Cf11dba09ef;                      1
+Lcom/tongsr/kaleido/sample/kd0bf18/Cd0bf18f520;                      1
+Lcom/tongsr/kaleido/sample/kf77a70/Cf77a70ae59;                      1
+Lcom/tongsr/kaleido/sample/RuntimeProtectedEntry;                    1
+
+Generated component descriptors under
+Lcom/tongsr/kaleido/sample/kaleido/generated/components/:             38
+
+Compose mapping sample
+----------------------
+
+compiled facade:
+com.tongsr.kaleido.sample.kaleido.generated.compose.KldCompose_02e7b7359eea
+
+class rewrite output:
+com.tongsr.kaleido.sample.kaleido.generated.compose.kbb68d0.Cbb68d0ad82
+
+final R8 descriptor:
+LC4464c49ea3;                                                         1
+
+The compiled and intermediate Compose descriptors each have zero class
+definitions in the final dump. composed-mapping.txt binds the compiled facade
+directly to C4464c49ea3, while raw-kaleido-mapping.txt and the raw R8 mapping
+record the two transformation steps.
+
+Reproduction commands
+---------------------
+
+Extract DEX files from plugin-enabled.aab, produce one text dump per DEX with
+the Android SDK dexdump tool, and concatenate those text files in DEX filename
+order. Then run:
+
+  shasum -a 256 classes.dex classes2.dex
+  rg -F "Class descriptor  : 'Lcom/tongsr/kaleido/sample/MainActivity;'" plugin-dexdump.txt
+  rg -F "Class descriptor  : 'Lcom/tongsr/kaleido/sample/k0fdd3c/C0fdd3c6f42;'" plugin-dexdump.txt
+  rg "Class descriptor.*Lcom/tongsr/kaleido/sample/kaleido/generated/components/" plugin-dexdump.txt | wc -l
+  rg -F "Class descriptor  : 'LC4464c49ea3;'" plugin-dexdump.txt
+
+The zero counts above were computed with the same exact-descriptor pattern and
+wc -l so that a non-match is recorded as zero instead of being omitted.
+
+Full dump download
+------------------
+
+https://github.com/ujffdi/Kaleido/releases/download/sample-aab-validation-2026-09-02/plugin-dexdump.txt.gz

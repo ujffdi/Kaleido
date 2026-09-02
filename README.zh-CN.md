@@ -116,6 +116,9 @@ Compose Generator 默认关闭。
 [`samples/kaleido-sample`](samples/kaleido-sample)。它使用同一套 Consumer 输入构建
 Kaleido AAB 与 Baseline AAB，便于对比。
 
+已发布的 [Sample AAB 验证报告](https://ujffdi.github.io/Kaleido/sample-aab-validation/)
+提供逐功能点的前后对比证据、Dexcount 量化结果及可下载的验证产物。
+
 ## 完整 `kaleido {}` 配置
 
 下面的 Kotlin DSL 代码块覆盖所有受支持的产品意图参数。实际项目只复制需要的控制

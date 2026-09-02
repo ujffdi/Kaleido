@@ -124,6 +124,10 @@ The executable developer example is
 [`samples/kaleido-sample`](samples/kaleido-sample). It builds Kaleido and
 baseline AABs from shared Consumer inputs for comparison.
 
+The published [Sample AAB validation report](https://ujffdi.github.io/Kaleido/sample-aab-validation/)
+provides concrete before/after evidence, Dexcount metrics, and downloadable
+comparison artifacts.
+
 ## Complete `kaleido {}` example
 
 The following Kotlin DSL block documents every supported product-intent
