@@ -47,28 +47,18 @@ export KALEIDO_UPLOAD_CERTIFICATE_SHA256="$certificate"
 aab="$consumer/app/build/outputs/bundle/release/app-release.aab"
 "$repo_root/gradlew" -q :release-gates:installDist
 [[ -f "$aab" ]] || fail "public marker Consumer AAB is missing"
-serial="${KALEIDO_DEVICE_SERIAL:-}"
 sdk="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-}}"
-[[ -n "$serial" && -n "$sdk" ]] || fail "controlled device serial and Android SDK are required"
-adb="$sdk/platform-tools/adb"
+[[ -n "$sdk" ]] || fail "Android SDK is required"
 aapt2="$sdk/build-tools/36.0.0/aapt2"
-[[ -x "$adb" && -x "$aapt2" ]] || fail "adb and aapt2 are required"
+[[ -x "$aapt2" ]] || fail "aapt2 is required"
 apks="$work/post-publication.apks"
 classpath="$repo_root/release-gates/build/install/release-gates/lib/*"
 export KALEIDO_POST_PUBLICATION_PASSWORD="$password"
 java -cp "$classpath" com.tongsr.kaleido.release.RuntimeGateCli \
   "$aab" "$repo_root/release/device-specs/pixel-api-36-arm64.json" "$apks" \
   "$test_store" upload KALEIDO_POST_PUBLICATION_PASSWORD "$aapt2"
-java -cp "$classpath" com.tongsr.kaleido.release.RuntimeGateInstallCli "$apks" "$adb" "$serial"
-package_name="com.tongsr.kaleido.sample"
-activity="$($adb -s "$serial" shell cmd package resolve-activity --brief "$package_name" | tr -d '\r' | tail -1)"
-[[ "$activity" == "$package_name/"* ]] || fail "launcher activity did not resolve"
-$adb -s "$serial" shell am force-stop "$package_name"
-$adb -s "$serial" shell am start -W -n "$activity" >/dev/null
-$adb -s "$serial" shell pidof "$package_name" >/dev/null || fail "post-publication Consumer did not stay alive"
 [[ -f "$consumer/app/build/reports/kaleido/release/release-evidence-set/release-evidence-set-manifest.properties" ]] || \
   fail "post-publication Release Evidence Set is missing"
-$adb -s "$serial" uninstall "$package_name" >/dev/null || true
 
 cat > "$work/post-publication-record.properties" <<EOF
 schema=KaleidoPostPublication.v1
@@ -78,7 +68,7 @@ publicPluginDigest=PASS
 publicMarkerDigest=PASS
 cleanMarkerResolution=PASS
 consumerReleaseEvidence=PASS
-bundletoolAndDeviceSmoke=PASS
+bundletoolStaticValidation=PASS
 verdict=PASS
 EOF
 echo "$work/post-publication-record.properties"

@@ -25,8 +25,8 @@ class PerformanceGateCliTest {
         private fun passing(): Properties {
             val values = Properties()
             values.setProperty("candidate.sha256", "abc")
-            values.setProperty("environment.os", "Linux")
-            values.setProperty("environment.arch", "x86_64")
+            values.setProperty("environment.os", "macOS")
+            values.setProperty("environment.arch", "arm64")
             values.setProperty("complexity.verdict", "PASS")
             values.setProperty("safe.clean.baselineSeconds", "1,1,100,100,100,100,100")
             values.setProperty("safe.clean.candidateSeconds", "1,1,120,120,120,120,120")
@@ -37,9 +37,6 @@ class PerformanceGateCliTest {
             values.setProperty("memory.peakMib.baseline", "1,1,1000,1000,1000,1000,1000")
             values.setProperty("memory.peakMib.candidate", "1,1,1400,1400,1400,1400,1400")
             for (prefix in arrayOf(
-                "sana.safe",
-                "sana.full",
-                "sana.compose512",
                 "sample.safe",
                 "sample.full",
             )) {

@@ -12,7 +12,7 @@ class FinalReleaseDossierCliTest {
     val temporary = TemporaryFolder()
 
     @Test
-    fun closesPrePublicationApprovalWithPublicRuntimeEvidence() {
+    fun closesPrePublicationApprovalWithPublicStaticBundleEvidence() {
         val root = temporary.root.toPath()
         val pre = Files.writeString(
             root.resolve("pre.properties"),
@@ -26,7 +26,7 @@ class FinalReleaseDossierCliTest {
                 "coordinates=io.github.ujffdi.kaleido:0.1.0\n" +
                 "publicPluginDigest=PASS\npublicMarkerDigest=PASS\n" +
                 "cleanMarkerResolution=PASS\nconsumerReleaseEvidence=PASS\n" +
-                "bundletoolAndDeviceSmoke=PASS\nverdict=PASS\n",
+                "bundletoolStaticValidation=PASS\nverdict=PASS\n",
         )
         val manifest = Files.writeString(
             root.resolve("manifest.properties"),

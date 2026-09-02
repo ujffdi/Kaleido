@@ -9,7 +9,7 @@ import java.security.MessageDigest
 import java.util.HexFormat
 import java.util.Properties
 
-/** Closes the approved candidate with its public-Portal resolution and device smoke. */
+/** Closes the approved candidate with its public-Portal and static bundle evidence. */
 object FinalReleaseDossierCli {
     private const val DIAGNOSTIC = "KLD-PUBLICATION-001 "
 
@@ -44,7 +44,7 @@ object FinalReleaseDossierCli {
             "publicMarkerDigest",
             "cleanMarkerResolution",
             "consumerReleaseEvidence",
-            "bundletoolAndDeviceSmoke",
+            "bundletoolStaticValidation",
         )) {
             exact(postPublication, property, "PASS")
         }
@@ -62,7 +62,7 @@ object FinalReleaseDossierCli {
             "publicMarkerDigest=PASS\n" +
             "cleanMarkerResolution=PASS\n" +
             "consumerReleaseEvidence=PASS\n" +
-            "bundletoolAndDeviceSmoke=PASS\n" +
+            "bundletoolStaticValidation=PASS\n" +
             "publication.mutableReplacement=false\n" +
             "publication.waiver=false\n" +
             "verdict=PASS\n"

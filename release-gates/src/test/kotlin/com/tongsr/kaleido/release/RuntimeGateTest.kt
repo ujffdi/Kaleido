@@ -33,7 +33,7 @@ class RuntimeGateTest {
 
     @Test
     fun failureMissingFixtureAndFalseNativeEvidenceBlockTheRow() {
-        val row = CompatibilityMatrix.requireRow("A4")
+        val row = CompatibilityMatrix.requireRow("A3")
         val incomplete = ArrayList(fixtures())
         incomplete.removeAt(0)
         assertThrows(IllegalArgumentException::class.java) {

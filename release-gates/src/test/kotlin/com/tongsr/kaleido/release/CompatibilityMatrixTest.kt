@@ -12,17 +12,10 @@ class CompatibilityMatrixTest {
     fun mandatoryRowsAreExactAndImmutable() {
         assertEquals(
             CompatibilityMatrix.Row(
-                "A3", "9.2.0", "9.4.1", "linux", "x86_64",
+                "A3", "9.2.0", "9.4.1", "macos", "arm64",
                 17, "36.0.0", 36, "built-in",
             ),
             CompatibilityMatrix.requireRow("A3"),
-        )
-        assertEquals(
-            CompatibilityMatrix.Row(
-                "A4", "9.3.2", "9.5.0", "linux", "x86_64",
-                17, "36.0.0", 36, "built-in",
-            ),
-            CompatibilityMatrix.requireRow("A4"),
         )
         assertThrows(UnsupportedOperationException::class.java) {
             (CompatibilityMatrix.mandatoryRows() as MutableMap<String, CompatibilityMatrix.Row>).clear()
@@ -38,7 +31,6 @@ class CompatibilityMatrixTest {
                 "java-safe",
                 "kotlin-safe",
                 "sample-comprehensive",
-                "sana-reference",
             ),
             CompatibilityMatrix.requiredFixtures(),
         )
@@ -56,19 +48,19 @@ class CompatibilityMatrixTest {
         val text = String(first, StandardCharsets.UTF_8)
         assertTrue(text.startsWith("schema=KaleidoCompatibilityMatrix.v1\n"))
         assertTrue(text.contains("row.agp=9.2.0\n"))
-        assertTrue(text.contains("row.os=linux\nrow.arch=x86_64\n"))
+        assertTrue(text.contains("row.os=macos\nrow.arch=arm64\n"))
         assertTrue(text.endsWith("verdict=PASS\n"))
     }
 
     @Test
     fun mismatchedEnvironmentIncompleteClosureAndFailureAreRejected() {
-        val expected = CompatibilityMatrix.requireRow("A4")
+        val expected = CompatibilityMatrix.requireRow("A3")
         val wrongHost = CompatibilityMatrix.Row(
             expected.id,
             expected.agp,
             expected.gradle,
-            "macos",
-            "arm64",
+            "linux",
+            "x86_64",
             expected.jdk,
             expected.buildTools,
             expected.compileSdk,

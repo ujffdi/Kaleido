@@ -1,5 +1,6 @@
 *.iml
 .gradle
+.kotlin/
 **/build/
 /local.properties
 /.idea/
@@ -14,7 +15,7 @@ local.properties
 # Local agent configuration, context, and planning artifacts
 /AGENTS.md
 /CONTEXT.md
-/docs/
-/CONTRIBUTING.md
-/SECURITY.md
+/docs/*
+!/docs/public/
+!/docs/public/**
 /.scratch/

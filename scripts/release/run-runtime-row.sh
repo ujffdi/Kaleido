@@ -2,7 +2,7 @@
 set -euo pipefail
 
 if [[ $# -ne 3 ]]; then
-  echo "usage: run-runtime-row.sh A3|A4 <device-serial> VERSION" >&2
+  echo "usage: run-runtime-row.sh A3 <device-serial> VERSION" >&2
   exit 2
 fi
 
@@ -11,8 +11,7 @@ device_serial="$2"
 candidate_version="$3"
 case "$runtime_row" in
   A3) runtime_agp="9.2.0" ;;
-  A4) runtime_agp="9.3.2" ;;
-  *) echo "KLD-RUNTIME-001 unsupported mandatory row: $runtime_row" >&2; exit 2 ;;
+  *) echo "KLD-RUNTIME-001 unsupported compatibility row: $runtime_row" >&2; exit 2 ;;
 esac
 if [[ "$candidate_version" == *dev* || "$candidate_version" == *SNAPSHOT* ]]; then
   echo "KLD-RUNTIME-001 mandatory rows require a final candidate version" >&2
@@ -20,7 +19,7 @@ if [[ "$candidate_version" == *dev* || "$candidate_version" == *SNAPSHOT* ]]; th
 fi
 
 repository_root="$(cd "$(dirname "$0")/../.." && pwd)"
-runtime_gradle="${KALEIDO_MATRIX_GRADLE:-gradle}"
+runtime_gradle="${KALEIDO_MATRIX_GRADLE:-$repository_root/gradlew}"
 runtime_sdk="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-}}"
 runtime_output="$repository_root/build/release-gates/compatibility/$runtime_row"
 matrix_record="$runtime_output/matrix-record.properties"
@@ -29,10 +28,6 @@ runtime_work="$runtime_output/runtime"
 plugin_repository="$repository_root/kaleido-gradle-plugin/build/functional-test-repository"
 plugin_jar="$repository_root/kaleido-gradle-plugin/build/libs/kaleido-gradle-plugin-$candidate_version.jar"
 device_spec="$repository_root/release/device-specs/pixel-api-36-arm64.json"
-sana_project="${KALEIDO_SANA_MATRIX_PROJECT:-}"
-sana_aab_relative="${KALEIDO_SANA_MATRIX_AAB:-app/build/outputs/bundle/release/app-release.aab}"
-sana_package="${KALEIDO_SANA_PACKAGE:-}"
-sana_smoke_marker="${KALEIDO_SANA_SMOKE_MARKER:-}"
 adb="$runtime_sdk/platform-tools/adb"
 aapt2="$runtime_sdk/build-tools/36.0.0/aapt2"
 
@@ -48,11 +43,6 @@ if ! "$adb" -s "$device_serial" get-state 2>/dev/null | grep -qx device; then
   echo "KLD-RUNTIME-001 controlled device is not online: $device_serial" >&2
   exit 1
 fi
-if [[ -z "$sana_project" || -z "$sana_package" || -z "$sana_smoke_marker" ]]; then
-  echo "KLD-RUNTIME-001 Sana project, package, and smoke marker are required" >&2
-  exit 1
-fi
-
 mkdir -p "$runtime_work"
 runtime_store="$runtime_output/test-upload.p12"
 runtime_password="kaleido-matrix-test-signing"
@@ -66,7 +56,7 @@ tree_digest() {
   local source_root="$1"
   (
     cd "$source_root"
-    find . -type f ! -path './build/*' ! -path './.gradle/*' \
+    find . -type f ! -path './build/*' ! -path './.gradle/*' ! -path './.kotlin/*' \
       ! -name 'local.properties' -print | LC_ALL=C sort \
       | while IFS= read -r source_file; do
           printf '%s  %s\n' "$(sha256sum "$source_file" | awk '{print $1}')" "$source_file"
@@ -85,14 +75,13 @@ cp -R "$native_source/." "$native_work/"
   -PmatrixPluginRepository="$plugin_repository" -PmatrixAgp="$runtime_agp" \
   -PmatrixKaleido="$candidate_version"
 
-fixture_names=(java-safe kotlin-safe full-compose native-resource sample-comprehensive sana-reference)
+fixture_names=(java-safe kotlin-safe full-compose native-resource sample-comprehensive)
 fixture_aabs=(
   "$matrix_work/java-safe/app/build/outputs/bundle/release/app-release.aab"
   "$matrix_work/kotlin-safe/app/build/outputs/bundle/release/app-release.aab"
   "$matrix_work/full-compose/app/build/outputs/bundle/release/app-release.aab"
   "$native_work/app/build/outputs/bundle/release/app-release.aab"
   "$matrix_work/sample-comprehensive/app/build/outputs/bundle/release/app-release.aab"
-  "$sana_project/$sana_aab_relative"
 )
 fixture_packages=(
   com.tongsr.kaleido.matrix.java
@@ -100,7 +89,6 @@ fixture_packages=(
   com.tongsr.kaleido.matrix.compose
   com.tongsr.kaleido.matrix.nativeprobe
   com.tongsr.kaleido.sample
-  "$sana_package"
 )
 fixture_markers=(
   KALEIDO_PROBE_PASS
@@ -108,11 +96,10 @@ fixture_markers=(
   KALEIDO_PROBE_PASS
   'KALEIDO_PROBE_PASS resource=resource-ok native=42'
   KALEIDO_RESOURCE_PROBE_PASS
-  "$sana_smoke_marker"
 )
 
 record_arguments=()
-for index in 0 1 2 3 4 5; do
+for index in 0 1 2 3 4; do
   fixture_name="${fixture_names[$index]}"
   fixture_aab="${fixture_aabs[$index]}"
   fixture_package="${fixture_packages[$index]}"

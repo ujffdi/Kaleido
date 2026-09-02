@@ -42,7 +42,7 @@ class CompatibilityFixtureContractTest {
         val compatibility = Files.readString(
             root.resolve("scripts/release/run-compatibility-row.sh"),
         )
-        assertTrue(compatibility.contains("io[.]github[.]ujffdi[.]kaleido"))
+        assertTrue(compatibility.contains("samplePluginRepository"))
         assertTrue(compatibility.contains("-PkaleidoVersion=\"\$candidate_version\""))
     }
 

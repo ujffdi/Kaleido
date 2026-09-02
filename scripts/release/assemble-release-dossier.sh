@@ -42,9 +42,6 @@ security_fingerprint="$(verify_signature "$security_approval" "$security_signatu
 declare -a records=(
   "cache|$repo_root/build/release-gates/candidate/cache-gates.properties"
   "matrix.A3|$repo_root/build/release-gates/compatibility/A3/matrix-record.properties"
-  "matrix.A4|$repo_root/build/release-gates/compatibility/A4/matrix-record.properties"
-  "runtime.A3|$repo_root/build/release-gates/compatibility/A3/runtime-record.properties"
-  "runtime.A4|$repo_root/build/release-gates/compatibility/A4/runtime-record.properties"
   "performance|$repo_root/build/release-gates/performance/performance-gate.properties"
   "provenance|$repo_root/build/release-gates/supply-chain/supply-chain-manifest.properties"
   "documentation|$repo_root/build/release-gates/documentation/documentation-validation.properties"

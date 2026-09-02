@@ -3,7 +3,7 @@ package com.tongsr.kaleido.release
 import java.nio.charset.StandardCharsets
 import java.util.regex.Pattern
 
-/** Canonical bundletool and controlled-device evidence for one mandatory row. */
+/** Canonical optional bundletool and controlled-device evidence for one compatibility row. */
 object RuntimeGate {
     const val SCHEMA: String = "KaleidoRuntimeGate.v1"
     const val BUNDLETOOL_VERSION: String = "1.18.1"
@@ -15,7 +15,6 @@ object RuntimeGate {
             "kotlin-safe",
             "native-resource",
             "sample-comprehensive",
-            "sana-reference",
         ),
     )
 

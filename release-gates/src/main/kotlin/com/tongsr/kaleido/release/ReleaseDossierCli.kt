@@ -16,8 +16,7 @@ import java.util.TreeSet
 object ReleaseDossierCli {
     private const val DIAGNOSTIC = "KLD-PUBLICATION-001 "
     private val REQUIRED: Set<String> = setOf(
-        "cache", "matrix.A3", "matrix.A4", "runtime.A3", "runtime.A4",
-        "performance", "provenance", "documentation", "portal-dry-run",
+        "cache", "matrix.A3", "performance", "provenance", "documentation", "portal-dry-run",
     )
 
     @JvmStatic

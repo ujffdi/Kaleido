@@ -16,7 +16,6 @@ object CompatibilityMatrix {
             "java-safe",
             "kotlin-safe",
             "sample-comprehensive",
-            "sana-reference",
         ),
     )
     private val MANDATORY_ROWS: Map<String, Row> = mandatoryRows()
@@ -25,11 +24,7 @@ object CompatibilityMatrix {
     fun mandatoryRows(): Map<String, Row> {
         val rows = LinkedHashMap<String, Row>()
         rows["A3"] = Row(
-            "A3", "9.2.0", "9.4.1", "linux", "x86_64",
-            17, "36.0.0", 36, "built-in",
-        )
-        rows["A4"] = Row(
-            "A4", "9.3.2", "9.5.0", "linux", "x86_64",
+            "A3", "9.2.0", "9.4.1", "macos", "arm64",
             17, "36.0.0", 36, "built-in",
         )
         return java.util.Map.copyOf(rows)

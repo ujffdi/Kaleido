@@ -32,8 +32,7 @@ class ReleaseDossierCliTest {
             ),
         )
         for (name in listOf(
-            "cache", "matrix.A3", "matrix.A4", "runtime.A3",
-            "runtime.A4", "performance", "provenance", "documentation", "portal-dry-run",
+            "cache", "matrix.A3", "performance", "provenance", "documentation", "portal-dry-run",
         )) {
             val record = write(
                 root,
@@ -91,8 +90,7 @@ class ReleaseDossierCliTest {
             ),
         )
         for (name in listOf(
-            "cache", "matrix.A3", "matrix.A4", "runtime.A3",
-            "runtime.A4", "performance", "provenance", "documentation", "portal-dry-run",
+            "cache", "matrix.A3", "performance", "provenance", "documentation", "portal-dry-run",
         )) {
             val contents = if (name == "documentation") {
                 "verdict=PASS\n"

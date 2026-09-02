@@ -25,14 +25,6 @@ checkout() {
 checkout android-junk-code https://github.com/qq549631030/AndroidJunkCode.git cfcd9eed0b8d5a938033a9268a20e58e059b3039
 checkout xml-class-guard https://github.com/liujingxing/XmlClassGuard.git 198cea9ccd87129d8ffb6ec5f258190a3b3ee8a1
 
-"$repo_root/gradlew" -q :release-gates:classes
-classpath="$repo_root/release-gates/build/classes/java/main:$repo_root/release-gates/build/resources/main"
-java -cp "$classpath" com.tongsr.kaleido.release.SimilarityAuditCli \
-  --output "$output" \
-  --candidate "$repo_root/kaleido-gradle-plugin/src/main" \
-  --candidate "$repo_root/release/fixtures" \
-  --candidate "$repo_root/samples" \
-  --upstream "$checkout_root/android-junk-code" \
-  --upstream "$checkout_root/xml-class-guard"
+"$repo_root/gradlew" -q :release-gates:runSimilarityAudit
 
 echo "$output"

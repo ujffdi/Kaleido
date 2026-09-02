@@ -39,6 +39,39 @@ val pluginMarkerPom = pluginProject.layout.buildDirectory.file(pluginVersion.map
         "io.github.ujffdi.kaleido.gradle.plugin-$it.pom"
 })
 
+tasks.register<JavaExec>("runSimilarityAudit") {
+    group = "verification"
+    description = "Audits independently authored content for substantial upstream similarity"
+    classpath = sourceSets.main.get().runtimeClasspath
+    mainClass = "com.tongsr.kaleido.release.SimilarityAuditCli"
+
+    val output = rootProject.layout.buildDirectory.file(
+        "release-gates/supply-chain/content-similarity-audit.properties"
+    )
+    val candidateRoots = listOf(
+        rootProject.file("kaleido-gradle-plugin/src/main"),
+        rootProject.file("release/fixtures"),
+        rootProject.file("samples"),
+    )
+    val upstreamRoots = listOf(
+        rootProject.file("build/release-gates/upstreams/android-junk-code"),
+        rootProject.file("build/release-gates/upstreams/xml-class-guard"),
+    )
+
+    inputs.files(candidateRoots + upstreamRoots)
+        .withPropertyName("auditedContent")
+        .withPathSensitivity(PathSensitivity.RELATIVE)
+    outputs.file(output)
+    args(
+        "--output", output.get().asFile.absolutePath,
+        "--candidate", candidateRoots[0].absolutePath,
+        "--candidate", candidateRoots[1].absolutePath,
+        "--candidate", candidateRoots[2].absolutePath,
+        "--upstream", upstreamRoots[0].absolutePath,
+        "--upstream", upstreamRoots[1].absolutePath,
+    )
+}
+
 tasks.register<JavaExec>("generateSupplyChainEvidence") {
     dependsOn(":kaleido-gradle-plugin:jar", ":kaleido-gradle-plugin:sourcesJar",
         ":kaleido-gradle-plugin:publishAllPublicationsToFunctionalTestRepository")
