@@ -27,6 +27,25 @@ Kaleido raises the cost of inspecting or tampering with an Android release. It
 does not guarantee store approval, review evasion, or absolute protection
 against every runtime loading mechanism.
 
+## Sample AAB validation report
+
+The [Sample AAB validation report (Chinese)](https://ujffdi.github.io/Kaleido/sample-aab-validation/)
+compares two Release AABs built from the same Sample sources: a baseline that
+does not apply Kaleido and an AAB that applies the `FULL` Profile. It traces
+each result from the baseline's final state, through Kaleido's transformation
+plan or mapping, to the plugin-enabled AAB's final state.
+
+The report cross-checks code and resource generation, synchronized class and
+XML references, final-AAB resource processing, Compose retention,
+deterministic R8 mappings, signing, bundle structure, and the Release Evidence
+Set. The evidence demonstrates that Kaleido participated in the build and that
+all four core capability families reached the final AAB.
+
+This is static-artifact and controlled-build evidence. It does not claim device
+runtime validation, coverage of every device, Google Play approval, or store
+acceptance. AAB size is reported only as a metric and is not treated as
+standalone proof that the plugin worked.
+
 ## Requirements
 
 Kaleido `0.1.0` is developed and tested with:
@@ -123,10 +142,6 @@ Activity, and no Compose generation.
 The executable developer example is
 [`samples/kaleido-sample`](samples/kaleido-sample). It builds Kaleido and
 baseline AABs from shared Consumer inputs for comparison.
-
-The published [Sample AAB validation report](https://ujffdi.github.io/Kaleido/sample-aab-validation/)
-provides concrete before/after evidence, Dexcount metrics, and downloadable
-comparison artifacts.
 
 ## Complete `kaleido {}` example
 

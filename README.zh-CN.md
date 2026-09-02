@@ -22,6 +22,21 @@ Kaleido 在一条自动流水线中统一执行四类能力：
 Kaleido 的目标是提高分析或篡改 Android Release 的成本。它不承诺应用商店审核
 通过、规避审核，也不保证绝对抵御所有运行时动态加载机制。
 
+## Sample AAB 验证报告
+
+[Sample AAB 验证报告](https://ujffdi.github.io/Kaleido/sample-aab-validation/)
+对比了由同一份 Sample 源码构建的两份 Release AAB：一份未应用 Kaleido 的
+baseline，以及一份应用 `FULL` Profile 的插件 AAB。报告按照“baseline 最终状态
+→ Kaleido 转换计划或映射 → 插件 AAB 最终状态”追踪每项结果。
+
+报告交叉检查了代码与资源生成、类及 XML 引用同步、最终 AAB 资源处理、Compose
+保留、确定性 R8 映射、签名、Bundle 结构和 Release Evidence Set。证据表明
+Kaleido 确实参与了构建，并且四项核心能力均已反映到最终 AAB。
+
+这些结论仅属于静态产物和受控构建验证，不代表已经完成真机运行验证、覆盖所有
+设备、通过 Google Play 审核或获得商店接受。AAB 体积只作为量化指标，不作为
+插件有效的独立证据。
+
 ## 接入要求
 
 Kaleido `0.1.0` 的开发与测试环境为：
@@ -115,9 +130,6 @@ Compose Generator 默认关闭。
 开发者可直接运行的完整示例位于
 [`samples/kaleido-sample`](samples/kaleido-sample)。它使用同一套 Consumer 输入构建
 Kaleido AAB 与 Baseline AAB，便于对比。
-
-已发布的 [Sample AAB 验证报告](https://ujffdi.github.io/Kaleido/sample-aab-validation/)
-提供逐功能点的前后对比证据、Dexcount 量化结果及可下载的验证产物。
 
 ## 完整 `kaleido {}` 配置
 
