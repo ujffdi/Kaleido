@@ -7,6 +7,6 @@ update public docs when a contract changes. Never add production credentials,
 private Consumer behavior, absolute paths, unsupported compatibility claims, or
 upstream source/templates without completed provenance review.
 
-Public breaking changes follow the Bridge Release and deprecation policy. A pull
-request may not waive matrix, runtime, reproducibility, performance, provenance,
-documentation, security-review, approval, or post-publication gates.
+Keep plugin tests, the public Sample build, documentation links, and
+`validatePlugins` passing. Performance, device, and extended compatibility work
+is optional and must be reported as such when performed.

@@ -5,7 +5,7 @@ release-hardening pipeline, including optional Runtime-only Compose generation,
 typed protection requirements, class and resource transformations, mapping
 composition, final-AAB signing, and atomic Release Evidence Sets.
 
-The supported Compatibility Matrix is limited to the exact macOS arm64 A3 row in
-the public documentation. Linux, Windows, AGP 9.3.2, and device installation
-are not certified by this release. This release makes no store-approval,
-SLSA-level, or absolute runtime-unreachability claim.
+Development and release validation used AGP 9.2.0, Gradle 9.4.1, JDK 17, Build
+Tools 36.0.0, and compileSdk 36 on macOS arm64. Other environments remain
+unverified. This release makes no store-approval, SLSA-level, or absolute
+runtime-unreachability claim.

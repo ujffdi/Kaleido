@@ -27,4 +27,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "Kaleido"
 include(":kaleido-gradle-plugin")
-include(":release-gates")

@@ -24,7 +24,7 @@ Kaleido 的目标是提高分析或篡改 Android Release 的成本。它不承�
 
 ## 接入要求
 
-Kaleido `0.1.0` 的公开兼容目标为：
+Kaleido `0.1.0` 的开发与测试环境为：
 
 | 主机 | Android Gradle Plugin | Gradle | JDK | Build Tools | compileSdk |
 | --- | --- | --- | --- | --- | --- |
@@ -35,15 +35,14 @@ Kaleido `0.1.0` 的公开兼容目标为：
 - 只能应用到 Android Application 模块，并且必须先应用
   `com.android.application`，再应用 Kaleido。
 - 必须声明名称精确为 `release` 的 Build Type，并启用 R8 压缩混淆。
-- 公开组合使用 AGP built-in Kotlin。
+- 使用 AGP built-in Kotlin。
 - 每个参与构建的 Release Variant 都必须有一套完整的上传签名来源。
 - 启用 Compose 生成时，Consumer Project 必须已经启用 Compose、应用
   `org.jetbrains.kotlin.plugin.compose`，并在 Release 编译类路径中提供 Compose
   Runtime。
 
-`0.1.0` 不认证 Linux、Windows、AGP 9.3.2 与设备安装；这些仅作为后续验证
-目标。MVP 不支持 Dynamic Feature、Asset Pack、AI Pack、test-only、Android
-Library 和 KMP 目标。
+其他主机和工具链版本尚未验证，但它们不是发布门禁。MVP 不支持 Dynamic
+Feature、Asset Pack、AI Pack、test-only、Android Library 和 KMP 目标。
 
 ## 快速接入
 
@@ -350,14 +349,14 @@ Release Evidence Set 包含 `artifact-report.txt`、证据清单以及 `mappings
 - `KLD-PROTECTION-*`：使用有界选择器、匹配的保护维度、真实的项目自有目标和审核
   原因。
 - `KLD-SIGNING-*`：由同一个来源提供全部五个字段，并验证上传证书指纹。
-- `KLD-COMPAT-*`：使用文档声明的精确主机和工具链组合。
+- `KLD-COMPAT-*`：使用经过测试的 AGP、Gradle 与 JDK 组合，并按照诊断中的
+  修复建议处理。
 
 先阅读第一条硬错误中的 `reason` 与 `repair`，修复后重新执行同一个精确 Variant。
 
 ## 更多文档
 
 - [接入、Profile、DSL 与签名](docs/public/adoption.md)
-- [兼容性与性能](docs/public/compatibility-and-performance.md)
 - [证据、诊断、映射与 Retrace](docs/public/evidence-and-diagnostics.md)
 - [威胁模型与安全边界](docs/public/security-model.md)
 - [升级与不可变发布策略](docs/public/upgrade-and-release.md)

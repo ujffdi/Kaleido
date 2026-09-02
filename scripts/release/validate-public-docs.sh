@@ -8,9 +8,8 @@ fi
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 version="$1"
-work_root="$repo_root/build/release-gates/documentation"
+work_root="$repo_root/build/release-validation"
 plugin_repository="$repo_root/kaleido-gradle-plugin/build/functional-test-repository"
-plugin_jar="$repo_root/kaleido-gradle-plugin/build/libs/kaleido-gradle-plugin-$version.jar"
 mkdir -p "$work_root"
 
 python3 - "$repo_root" <<'PY'
@@ -109,23 +108,4 @@ cp -R "$repo_root/$sample/." "$target/"
   -PsampleAgpVersion=9.2.0 -PsampleKaleidoVersion="$version"
 verify_sample_outputs "$target"
 
-[[ -f "$plugin_jar" ]] || {
-  echo "KLD-PUBLICATION-001 candidate plugin JAR is missing" >&2
-  exit 1
-}
-candidate_sha256="$(shasum -a 256 "$plugin_jar" | awk '{print $1}')"
-
-cat > "$work_root/documentation-validation.properties" <<EOF
-schema=KaleidoDocumentationValidation.v1
-candidate.version=$version
-candidate.sha256=$candidate_sha256
-markerResolution=PASS
-sampleComprehensive=PASS
-baselineComparison=PASS
-releaseEvidenceClosure=PASS
-links=PASS
-diagnostics=PASS
-credentials=test-only
-verdict=PASS
-EOF
-echo "$work_root/documentation-validation.properties"
+echo "Kaleido public documentation and Sample AAB validation passed for $version"

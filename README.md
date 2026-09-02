@@ -29,7 +29,7 @@ against every runtime loading mechanism.
 
 ## Requirements
 
-Kaleido `0.1.0` has this exact public compatibility target:
+Kaleido `0.1.0` is developed and tested with:
 
 | Host | Android Gradle Plugin | Gradle | JDK | Build Tools | compileSdk |
 | --- | --- | --- | --- | --- | --- |
@@ -40,15 +40,15 @@ Additional requirements:
 - Apply Kaleido to an Android application module after
   `com.android.application`.
 - Declare an exact `release` build type and enable R8 minification.
-- Use AGP built-in Kotlin for the public row.
+- Use AGP built-in Kotlin.
 - Provide one complete upload-signing source for every Release variant built.
 - Compose generation additionally requires an already Compose-enabled Consumer
   Project, `org.jetbrains.kotlin.plugin.compose`, and Compose Runtime on the
   Release compile classpath.
 
-Linux, Windows, AGP 9.3.2, and device installation are forward-validation
-targets, not certified support in `0.1.0`. Dynamic Feature, Asset Pack, AI Pack,
-test-only, Android library, and KMP targets are outside the MVP topology.
+Other hosts and toolchain versions have not been verified yet. They are not
+publication gates. Dynamic Feature, Asset Pack, AI Pack, test-only, Android
+library, and KMP targets are outside the MVP topology.
 
 ## Quick start
 
@@ -362,7 +362,8 @@ build publishes no partial or stale success set.
   project-owned target, and a review reason.
 - `KLD-SIGNING-*`: provide all five fields from one source and verify the upload
   certificate fingerprint.
-- `KLD-COMPAT-*`: use the exact documented host and toolchain row.
+- `KLD-COMPAT-*`: use a tested AGP, Gradle, and JDK configuration and follow the
+  diagnostic repair.
 
 Read the first hard diagnostic's `reason` and `repair`, fix it, then rerun the
 same exact variant.
@@ -370,7 +371,6 @@ same exact variant.
 ## More documentation
 
 - [Adoption, profiles, DSL, and signing](docs/public/adoption.md)
-- [Compatibility and performance](docs/public/compatibility-and-performance.md)
 - [Evidence, diagnostics, mappings, and retrace](docs/public/evidence-and-diagnostics.md)
 - [Threat model and security boundaries](docs/public/security-model.md)
 - [Upgrade and immutable release policy](docs/public/upgrade-and-release.md)

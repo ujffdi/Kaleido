@@ -23,8 +23,9 @@ mapping mismatch, or stale evidence block publication.
 The canonical unsigned Bundle is the reproducible boundary. Final signing may be
 nondeterministic across cryptographic providers and environments; Kaleido records
 the signed digest and verifies content closure rather than promising identical
-signature bytes. The project publishes a digest manifest and CycloneDX SBOM but
-does not claim a SLSA level or an upstream permission that has not been obtained.
+signature bytes. The project retains its license, notices, and upstream source
+records without claiming a SLSA level or an upstream permission that has not
+been obtained.
 
 For vulnerability reporting, see [`SECURITY.md`](../../SECURITY.md). Do not attach
 production keys, passwords, private application source, or unsanitized customer

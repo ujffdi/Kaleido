@@ -10,9 +10,9 @@ the same Kotlin, Manifest, resources, assets, Java resources, and native test in
 - `app` applies Kaleido with `FULL`, all generation families, Compose Generator,
   Protection Requirements, and the bounded Full-only resource controls.
 
-The project builds both AABs for artifact and runtime comparison. Minimal Java Safe,
-built-in Kotlin Safe, Full Compose, and native Release Fixtures remain under
-`release/fixtures`; they are machine-facing acceptance projects, not tutorials.
+The project builds both AABs for developer-facing artifact comparison. Focused
+plugin behaviors are covered by the plugin's TestKit tests rather than a retained
+release-fixture matrix.
 
 ## 中文
 
@@ -24,6 +24,5 @@ built-in Kotlin Safe, Full Compose, and native Release Fixtures remain under
 - `app` 使用 Kaleido `FULL`，覆盖全部生成能力、Compose Generator、Protection
   Requirements，以及边界明确的 Full-only 资源操作。
 
-该工程会同时生成两个 AAB，供产物与运行时对比。`release/fixtures` 中仍保留最小 Java
-Safe、内建 Kotlin Safe、Full Compose 和 Native Release Fixture；它们用于机器验收，
-不是开发教程。
+该工程会同时生成两个 AAB，供开发者对比产物。插件的具体行为由 TestKit 测试覆盖，
+不再维护单独的发布验收 Fixture 矩阵。

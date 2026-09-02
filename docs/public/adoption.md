@@ -11,9 +11,8 @@ The single comprehensive Sample App is
 [`samples/kaleido-sample`](../../samples/kaleido-sample). Its shared `baseline` and
 `app` modules provide ordinary and Full-plus-Compose AABs from the same Consumer
 source tree. It is compiled against the packaged plugin marker by
-`scripts/release/validate-public-docs.sh` and the Compatibility Matrix row. Minimal
-Safe, Full Compose, and native projects remain under `release/fixtures` as
-machine-facing acceptance inputs, not developer examples.
+`scripts/release/validate-public-docs.sh`. It is developer-facing executable
+documentation rather than a mandatory compatibility matrix.
 
 ## Safe Defaults v1
 

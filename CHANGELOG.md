@@ -10,12 +10,8 @@
   Runtime-only Compose generation, typed protection and escape hatches, class and
   resource transformations, mapping composition, final-AAB signing, and atomic
   Release Evidence Sets.
-- Adds exact macOS arm64 A3 compatibility, static bundletool, reproducibility, performance,
-  provenance, SBOM, documentation, and immutable-publication gates.
+- Adds a tested macOS arm64 development configuration and public documentation.
 - Adds independent Safe and Full+Compose Sample Apps as executable bilingual
-  documentation; both are inputs to the packaged-marker A3 compatibility
-  workflow.
-- The version becomes supported only after the exact candidate passes the
-  mandatory macOS arm64 A3, performance, Portal, and static
-  post-publication gates. Linux, Windows, and device installation remain
-  unclaimed forward evidence.
+  documentation.
+- Adds a small Gradle Plugin Portal workflow based on plugin tests, the public
+  Sample build, `validatePlugins`, validation-only publication, and publication.

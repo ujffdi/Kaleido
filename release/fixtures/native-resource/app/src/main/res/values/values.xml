@@ -1,4 +1,0 @@
-<resources>
-    <string name="probe_value">resource-ok</string>
-    <style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar" />
-</resources>

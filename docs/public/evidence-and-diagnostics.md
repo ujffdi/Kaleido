@@ -10,9 +10,7 @@ composed mapping, resource mapping, deterministic evidence, and one
 The deterministic boundary contains generated content, immutable plans and
 receipts, dictionaries/rules, mappings, canonical unsigned AAB, and deterministic
 evidence. Signing and runtime observations are outside byte reproducibility but
-must bind the exact unsigned digest. Configuration Cache, no-clean up-to-date,
-local/relocated Build Cache, and independent clean byte reproduction are separate
-claims.
+must bind the exact unsigned digest.
 
 ## Diagnostics
 

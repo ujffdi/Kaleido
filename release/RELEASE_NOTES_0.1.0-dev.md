@@ -2,7 +2,6 @@
 
 This is a candidate description, not a public release announcement. It introduces
 the first complete Safe/Full pipeline and evidence contract described in the
-root documentation. Compatibility is limited to the exact macOS arm64 A3 row after the
-same immutable bytes pass every required gate. Known outstanding release gates
-are tracked in local tickets 35–40; no store approval, SLSA level, or absolute
-runtime-unreachability claim is made.
+root documentation. Development validation uses AGP 9.2.0, Gradle 9.4.1, and
+JDK 17 on macOS arm64. No store approval, SLSA level, broad toolchain support,
+or absolute runtime-unreachability claim is made.

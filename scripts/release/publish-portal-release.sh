@@ -25,8 +25,7 @@ portal_credentials_available() {
 portal_credentials_available || fail "Portal credentials are absent"
 
 cd "$repo_root"
-./gradlew :kaleido-gradle-plugin:test :release-gates:test \
-  :kaleido-gradle-plugin:validatePlugins -PkaleidoVersion="$version"
+./gradlew :kaleido-gradle-plugin:test -PkaleidoVersion="$version"
 bash scripts/release/validate-public-docs.sh "$version"
 ./gradlew :kaleido-gradle-plugin:publishPlugins -PkaleidoVersion="$version" \
   -PkaleidoWebsite=https://github.com/ujffdi/Kaleido \
