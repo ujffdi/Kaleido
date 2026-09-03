@@ -2,40 +2,70 @@
 
 [简体中文](README.md) | [English](README.en.md)
 
-Kaleido 是一个采用 Apache-2.0 许可证的 Gradle 插件，用于对 Android Release
-AAB 进行确定性、可审计的构建加固。接入方只需应用一个插件，按需配置一个
-`kaleido {}` 块，然后继续执行原有的 Release Bundle 任务。
+Kaleido 是一个采用 Apache-2.0 许可证、面向 Android Release AAB 的 Gradle
+构建加固插件。它把原本分散在代码与资源生成、类名与 Manifest/XML 引用联动、
+R8、最终 AAB 资源处理、重新签名和产物验证中的工作，接入同一次常规
+`bundleRelease`。
 
-## 插件作用
+接入方只需应用一个插件，按需配置一个 `kaleido {}` 块，然后继续执行原有的
+Release Bundle 任务。Kaleido 不修改 Consumer Project 的 `src/`；生成内容和中间
+产物都位于 `build/` 下。
 
-Kaleido 在一条自动流水线中统一执行四类能力：
+## 为什么需要 Kaleido
 
-1. 确定性生成 Kotlin 代码、XML 资源、字符串和可选的 Manifest 组件；需要显式
-   启用的 Compose Generator 属于这一类能力。
-2. 改写符合条件的应用类名，并同步处理受支持的 Manifest/XML 类引用。
-3. 混淆和优化最终 AAB 中的资源，同时保留资源 ID 以及声明保护的名称和路径。
-4. 生成确定性的 R8 字典，并为同一个 Release 产物发布原始映射与组合映射。
+Android Release 的可分析面不只存在于 DEX 类名。Manifest 和 XML 可能继续引用应用
+类，资源表和文件路径可能保留业务语义，而类名经过 Kaleido 与 R8 两个阶段后还需要
+一份从原始身份到最终身份的完整映射。若这些环节彼此独立，漏改一处引用就可能导致
+组件实例化、XML inflate、资源加载、Retrace 或最终 AAB 签名失效。
 
-`SAFE` 和 `FULL` 都会执行全部四类能力。`FULL` 只解锁显式选择的 Activity 生成与
-资源操作；仅选择 `FULL` 不会自动删除或过滤任何内容。
+Kaleido 把这些相互依赖的工作组织成一条自动、确定且可审计的 Release 流水线：
 
-Kaleido 的目标是提高分析或篡改 Android Release 的成本。它不承诺应用商店审核
-通过、规避审核，也不保证绝对抵御所有运行时动态加载机制。
+| Release 中的问题或分散环节 | Kaleido 的处理 | 最终结果 |
+| --- | --- | --- |
+| 需要额外生成加固内容 | 按稳定种子生成 Kotlin、XML、字符串及可选 Manifest/Compose 内容 | 不改动 `src/`，相同声明输入、种子和工具链可重复生成 |
+| 应用类名与 Manifest/XML 引用相互关联 | 改写符合条件的应用类，并同步处理受支持的非代码引用 | 类身份发生变化，同时保持已支持引用闭合 |
+| 资源名称、文件路径和重复载荷暴露在最终 Bundle 中 | 在最终 AAB 中协调改写资源名、引用和路径，并安全合并兼容的重复载荷 | 保留资源 ID 和声明保护项，降低资源结构的可读性 |
+| Kaleido 类改写与 R8 产生多层名称变化 | 生成确定性 R8 字典，保留原始映射并发布组合映射 | 可用同一个 Release Evidence Set 中的映射执行 Retrace 和审计 |
+| 最终 AAB 经过二次变换 | 重新签名，核对证书和签名覆盖，验证 Bundle 结构后原子发布 | 只发布完整通过验证的 AAB、映射和 Artifact Report |
 
-## Sample AAB 验证报告
+一次正常构建中的核心路径如下：
+
+```text
+:app:bundleRelease
+  → 校验配置与签名输入
+  → 生成并编译加固内容
+  → 改写应用类及 Manifest/XML 引用
+  → 执行 R8 并组合映射
+  → 改写最终 AAB 资源
+  → 重新签名并验证
+  → 发布 AAB + mappings + Artifact Report
+```
+
+代码与资源生成、类名及引用联动、最终 AAB 资源处理、确定性 R8 字典与映射构成
+Kaleido 的四类核心能力。`SAFE` 和 `FULL` 都会执行全部四类能力；`FULL` 只解锁显式
+选择的 Activity 生成与资源操作，仅选择 `FULL` 不会自动删除或过滤任何内容。
+
+## 真实 Sample 中的可见变化
 
 [Sample AAB 验证报告](https://ujffdi.github.io/Kaleido/sample-aab-validation/)
-对比了由同一份 Sample 源码构建的两份 Release AAB：一份未应用 Kaleido 的
-baseline，以及一份应用 `FULL` Profile 的插件 AAB。报告按照“baseline 最终状态
-→ Kaleido 转换计划或映射 → 插件 AAB 最终状态”追踪每项结果。
+使用同一份 Sample `src/main` 构建两份 Release AAB：baseline 不应用 Kaleido，
+plugin-enabled AAB 应用 `FULL` Profile。报告按照“baseline 最终状态 → Kaleido
+转换计划或映射 → 插件 AAB 最终状态”核对真实产物，其中包括：
 
-报告交叉检查了代码与资源生成、类及 XML 引用同步、最终 AAB 资源处理、Compose
-保留、确定性 R8 映射、签名、Bundle 结构和 Release Evidence Set。证据表明
-Kaleido 确实参与了构建，并且四项核心能力均已反映到最终 AAB。
+| 检查项 | Baseline | Kaleido 最终产物 |
+| --- | --- | --- |
+| Activity 类身份 | `com.tongsr.kaleido.sample.MainActivity` | `com.tongsr.kaleido.sample.k0fdd3c.C0fdd3c6f42`；Manifest 使用新名称，DEX 中旧描述符为 0 |
+| Layout 名称与路径 | `layout/activity_main`、`base/res/layout/activity_main.xml` | `layout/kc472b50c80`、`base/res/layout/kc472b50c80.xml`；改写边界内资源 ID 保持不变 |
+| 重复 Drawable | 两个不同资源 ID 各有文件载荷 | 资源 ID 继续独立，内容相同的资源指向同一份规范化文件载荷 |
+| 发布完整性 | 插件未运行 | 生成、类引用、R8、资源、签名、Bundle 验证和原子发布阶段全部通过 |
 
-这些结论仅属于静态产物和受控构建验证，不代表已经完成真机运行验证、覆盖所有
-设备、通过 Google Play 审核或获得商店接受。AAB 体积只作为量化指标，不作为
-插件有效的独立证据。
+结论依据来自最终 Manifest、资源表、编译 XML、DEX、ZIP 条目、raw/composed
+mapping、签名回执和 Bundle 验证，而不是仅凭 AAB 大小或字符串搜索判断插件有效。
+
+Kaleido 的目标是提高静态分析或篡改 Android Release 的成本，并留下可核查的构建
+证据。它不是运行时安全框架，不能替代业务安全、服务端校验或密钥保护；也不承诺
+应用商店审核通过、规避审核或绝对抵御所有运行时动态加载机制。当前 Sample 结论
+属于静态产物和受控构建验证，不代表已经完成真机运行、覆盖所有设备或获得商店接受。
 
 ## 接入要求
 

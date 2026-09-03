@@ -2,49 +2,81 @@
 
 [简体中文](README.md) | [English](README.en.md)
 
-Kaleido is an Apache-2.0 Gradle plugin for deterministic, auditable Android
-Release AAB hardening. Apply one plugin, optionally configure one `kaleido {}`
-block, and keep using the normal Release bundle task.
+Kaleido is an Apache-2.0 Gradle build-hardening plugin for Android Release AABs.
+It connects code and resource generation, coordinated class and Manifest/XML
+reference rewriting, R8, final-AAB resource processing, re-signing, and artifact
+validation to the same normal `bundleRelease` invocation.
 
-## What it does
+Adopters apply one plugin, optionally configure one `kaleido {}` block, and keep
+using their existing Release bundle task. Kaleido does not modify the Consumer
+Project's `src/`; generated content and intermediate artifacts stay under
+`build/`.
 
-Kaleido runs four capability families in one automatic pipeline:
+## Why Kaleido exists
 
-1. Generates deterministic Kotlin code, XML resources, strings, and optional
-   Manifest components. The opt-in Compose Generator belongs to this family.
-2. Rewrites eligible application class names and keeps supported Manifest/XML
-   class references synchronized.
-3. Obfuscates and optimizes final-AAB resources while preserving resource IDs
-   and declared protected names and paths.
-4. Generates deterministic R8 dictionaries and publishes raw and composed
-   mappings for the exact Release artifact.
+An Android release exposes more analyzable structure than DEX class names.
+Manifest and XML can continue to reference application classes, resource-table
+entries and packaged paths can preserve business meaning, and names transformed
+by Kaleido and R8 need one complete original-to-final mapping. If these stages
+operate independently, one missed reference can break component instantiation,
+XML inflation, resource loading, Retrace, or final-AAB signing.
 
-Both `SAFE` and `FULL` run all four families. `FULL` only unlocks explicitly
-selected Activity generation and resource operations; selecting it performs no
-deletion or filtering by itself.
+Kaleido organizes these interdependent steps into one automatic, deterministic,
+and auditable Release pipeline:
 
-Kaleido raises the cost of inspecting or tampering with an Android release. It
-does not guarantee store approval, review evasion, or absolute protection
-against every runtime loading mechanism.
+| Release concern or disconnected step | What Kaleido does | Result |
+| --- | --- | --- |
+| Additional hardening content is needed | Generates Kotlin, XML, strings, and optional Manifest/Compose content from a stable seed | Leaves `src/` unchanged and reproduces generation for identical declared inputs, seed, and toolchain |
+| Application class names are coupled to Manifest/XML references | Rewrites eligible application classes and synchronizes supported non-code references | Changes class identities while keeping supported reference closure intact |
+| Resource names, packaged paths, and duplicate payloads remain in the final Bundle | Coordinates resource-name, reference, and path rewriting in the final AAB and safely merges compatible duplicate payloads | Preserves resource IDs and declared protections while reducing readable resource structure |
+| Kaleido class rewriting and R8 create multiple naming layers | Generates deterministic R8 dictionaries, retains raw mappings, and publishes a composed mapping | Enables Retrace and audit with mappings bound to the same Release Evidence Set |
+| The final AAB has been transformed again | Re-signs it, verifies certificate identity and signature coverage, validates Bundle structure, and publishes atomically | Publishes only a fully validated AAB, mappings, and Artifact Report |
 
-## Sample AAB validation report
+The core path of a normal build is:
+
+```text
+:app:bundleRelease
+  → validate configuration and signing inputs
+  → generate and compile hardening content
+  → rewrite application classes and Manifest/XML references
+  → run R8 and compose mappings
+  → rewrite final-AAB resources
+  → re-sign and validate
+  → publish AAB + mappings + Artifact Report
+```
+
+Code and resource generation, coordinated class and reference rewriting,
+final-AAB resource processing, and deterministic R8 dictionary and mapping
+handling are Kaleido's four core capability families. Both `SAFE` and `FULL`
+run all four. `FULL` only unlocks explicitly selected Activity generation and
+resource operations; selecting it performs no deletion or filtering by itself.
+
+## Visible changes in the real Sample
 
 The [Sample AAB validation report (Chinese)](https://ujffdi.github.io/Kaleido/sample-aab-validation/)
-compares two Release AABs built from the same Sample sources: a baseline that
-does not apply Kaleido and an AAB that applies the `FULL` Profile. It traces
-each result from the baseline's final state, through Kaleido's transformation
-plan or mapping, to the plugin-enabled AAB's final state.
+builds two Release AABs from the same Sample `src/main`: a baseline without
+Kaleido and a plugin-enabled AAB using the `FULL` Profile. It checks each result
+through the chain “baseline final state → Kaleido plan or mapping →
+plugin-enabled final state,” including these concrete changes:
 
-The report cross-checks code and resource generation, synchronized class and
-XML references, final-AAB resource processing, Compose retention,
-deterministic R8 mappings, signing, bundle structure, and the Release Evidence
-Set. The evidence demonstrates that Kaleido participated in the build and that
-all four core capability families reached the final AAB.
+| Check | Baseline | Final Kaleido artifact |
+| --- | --- | --- |
+| Activity identity | `com.tongsr.kaleido.sample.MainActivity` | `com.tongsr.kaleido.sample.k0fdd3c.C0fdd3c6f42`; the Manifest uses the new name and the old DEX descriptor count is zero |
+| Layout name and path | `layout/activity_main`, `base/res/layout/activity_main.xml` | `layout/kc472b50c80`, `base/res/layout/kc472b50c80.xml`; the resource ID is preserved across the rewrite boundary |
+| Duplicate drawables | Two distinct resource IDs each have a file payload | The IDs remain distinct while byte-identical resources reference one canonical file payload |
+| Publication integrity | Kaleido does not run | Generation, class-reference, R8, resource, signing, Bundle-validation, and atomic-publication stages all pass |
 
-This is static-artifact and controlled-build evidence. It does not claim device
-runtime validation, coverage of every device, Google Play approval, or store
-acceptance. AAB size is reported only as a metric and is not treated as
-standalone proof that the plugin worked.
+The conclusion comes from the final Manifest, resource table, compiled XML,
+DEX, ZIP entries, raw/composed mappings, signing receipt, and Bundle validation,
+not from AAB size or vague string searches alone.
+
+Kaleido raises the cost of statically inspecting or tampering with an Android
+release and leaves auditable build evidence. It is not a runtime security
+framework and does not replace business security, server-side validation, or
+key protection. It does not guarantee store approval, review evasion, or
+absolute protection against every runtime loading mechanism. The current Sample
+provides static-artifact and controlled-build evidence, not device-runtime,
+all-device, or store-acceptance validation.
 
 ## Requirements
 
