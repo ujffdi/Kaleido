@@ -69,7 +69,7 @@ Kaleido 的目标是提高静态分析或篡改 Android Release 的成本，并�
 
 ## 接入要求
 
-Kaleido `0.1.0` 的开发与测试环境为：
+Kaleido `0.1.1` 的开发与测试环境为：
 
 | 主机 | Android Gradle Plugin | Gradle | JDK | Build Tools | compileSdk |
 | --- | --- | --- | --- | --- | --- |
@@ -111,7 +111,7 @@ Kaleido：
 ```kotlin
 plugins {
     id("com.android.application") version "9.2.0"
-    id("io.github.ujffdi.kaleido") version "0.1.0"
+    id("io.github.ujffdi.kaleido") version "0.1.1"
 }
 
 android {
