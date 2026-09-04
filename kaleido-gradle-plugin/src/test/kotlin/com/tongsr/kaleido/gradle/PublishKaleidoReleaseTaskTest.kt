@@ -1,5 +1,7 @@
 package com.tongsr.kaleido.gradle
 
+import java.io.ByteArrayInputStream
+import java.io.InputStream
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import java.util.HexFormat
@@ -11,6 +13,59 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class PublishKaleidoReleaseTaskTest {
+    @Test
+    fun embeddedPluginVersionMatchesPublishedArtifactVersion() {
+        assertEquals(
+            System.getProperty("kaleido.test.plugin.version", "0.1.1-dev"),
+            KaleidoPluginVersion.current(),
+        )
+    }
+
+    @Test
+    fun missingBlankOrUnspecifiedPluginVersionFailsClosed() {
+        val invalidResources = listOf<InputStream?>(
+            null,
+            ByteArrayInputStream("unrelated=value\n".toByteArray(StandardCharsets.UTF_8)),
+            ByteArrayInputStream("pluginVersion=\n".toByteArray(StandardCharsets.UTF_8)),
+            ByteArrayInputStream("pluginVersion=unspecified\n".toByteArray(StandardCharsets.UTF_8)),
+        )
+
+        invalidResources.forEach { resource ->
+            val failure = assertThrows(IllegalArgumentException::class.java) {
+                KaleidoPluginVersion.read(resource)
+            }
+            assertTrue(failure.message!!.startsWith("KLD-PUBLICATION-001"))
+        }
+    }
+
+    @Test
+    fun invalidPluginVersionCannotAssembleOrReplaceSuccessfulEvidence() {
+        val signed = "signed-aab".toByteArray(StandardCharsets.UTF_8)
+        val successful = PublishKaleidoReleaseTask.assemble(
+            context(),
+            evidence("build/"),
+            signed,
+            signing(signed),
+        )
+        val priorFiles = successful.files.mapValues { (_, bytes) -> bytes.clone() }
+
+        listOf("", "unspecified").forEach { invalidVersion ->
+            val failure = assertThrows(IllegalArgumentException::class.java) {
+                PublishKaleidoReleaseTask.assemble(
+                    context().copy(pluginVersion = invalidVersion),
+                    evidence("build/"),
+                    signed,
+                    signing(signed),
+                )
+            }
+            assertTrue(failure.message!!.startsWith("KLD-PUBLICATION-001"))
+        }
+
+        priorFiles.forEach { (name, bytes) ->
+            assertArrayEquals(bytes, successful.files.getValue(name))
+        }
+    }
+
     @Test
     fun canonicalSetIsStableCompleteAndPathIndependent() {
         val signed = "signed-aab".toByteArray(StandardCharsets.UTF_8)
@@ -95,7 +150,7 @@ class PublishKaleidoReleaseTaskTest {
     }
 
     private fun context(): PublishKaleidoReleaseTask.Context =
-        PublishKaleidoReleaseTask.Context(":app", "release", "0.1.0-dev")
+        PublishKaleidoReleaseTask.Context(":app", "release", "0.1.1-dev")
 
     private fun evidence(prefix: String): Map<String, ByteArray> {
         val unsigned = "unsigned-aab".toByteArray(StandardCharsets.UTF_8)

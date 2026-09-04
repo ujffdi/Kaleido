@@ -1985,6 +1985,8 @@ class KaleidoPluginFunctionalTest {
                     id(%s) version %s
                 }
 
+                version = "consumer-project-version"
+
                 android {
                     namespace = "example.consumer"
                     compileSdk = 36
@@ -2095,7 +2097,7 @@ class KaleidoPluginFunctionalTest {
     }
 
     private fun testPluginVersion(): String =
-        System.getProperty("kaleido.test.plugin.version", "0.1.0-dev")
+        System.getProperty("kaleido.test.plugin.version", "0.1.1-dev")
 
     private fun testAgpVersion(): String =
         System.getProperty("kaleido.test.agp", "9.2.0")
@@ -2181,6 +2183,8 @@ class KaleidoPluginFunctionalTest {
         assertEquals(":app", manifest["project"])
         assertEquals(variant, manifest["variant"])
         assertEquals("PUBLISHED", manifest["publicationResult"])
+        assertEquals(testPluginVersion(), manifest["pluginVersion"])
+        assertFalse(manifest.values.contains("consumer-project-version"))
         val publicBundle = projectDirectory.resolve(
             "app/build/outputs/bundle/$variant/app-$variant.aab",
         )
@@ -2250,6 +2254,8 @@ class KaleidoPluginFunctionalTest {
             report.lineSequence().count { line -> line.matches(Regex("stage\\.[0-9]{2}=.+\\|PASS")) },
         )
         assertTrue(report.contains("proofLimitations="))
+        assertTrue(report.contains("pluginVersion=${testPluginVersion()}\n"))
+        assertFalse(report.contains("pluginVersion=consumer-project-version"))
         assertFalse(report.contains(projectDirectory.toAbsolutePath().toString()))
         assertFalse(report.contains(System.getProperty("user.home")))
         val composed = Files.readString(root.resolve("mappings/composed-mapping.txt"))

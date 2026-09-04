@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "io.github.ujffdi"
-version = providers.gradleProperty("kaleidoVersion").getOrElse("0.1.0-dev")
+version = providers.gradleProperty("kaleidoVersion").getOrElse("0.1.1-dev")
 val kaleidoWebsite = providers.gradleProperty("kaleidoWebsite")
     .getOrElse("https://github.com/ujffdi/Kaleido")
 val kaleidoVcsUrl = providers.gradleProperty("kaleidoVcsUrl")
@@ -32,6 +32,11 @@ kotlin {
 }
 
 tasks.processResources {
+    val pluginVersion = project.version.toString()
+    inputs.property("kaleidoVersion", pluginVersion)
+    filesMatching("META-INF/kaleido/version.properties") {
+        expand("kaleidoVersion" to pluginVersion)
+    }
     from(rootProject.file("LICENSE")) { into("META-INF") }
     from(rootProject.file("NOTICE")) { into("META-INF") }
     from(rootProject.file("THIRD_PARTY_NOTICES.md")) { into("META-INF") }

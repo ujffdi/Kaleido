@@ -598,7 +598,8 @@ class KaleidoPlugin : Plugin<Project> {
                 task.dependsOn(signTask)
                 task.consumerProjectPath!!.set(projectPath)
                 task.variantName!!.set(variantName)
-                task.pluginVersion!!.set(project.version.toString())
+                task.pluginVersion!!.set(KaleidoPluginVersion.current())
+                task.pluginVersion!!.disallowChanges()
                 task.consumerProjectDirectory!!.set(project.layout.projectDirectory)
                 task.stagedSignedBundle!!.set(
                     signTask.flatMap { it.outputBundle!! },

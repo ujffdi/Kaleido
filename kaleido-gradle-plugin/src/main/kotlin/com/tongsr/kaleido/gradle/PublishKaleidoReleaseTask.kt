@@ -133,6 +133,7 @@ abstract class PublishKaleidoReleaseTask : DefaultTask() {
             signedBundle: ByteArray,
             signingBytes: ByteArray,
         ): Publication {
+            val pluginVersion = KaleidoPluginVersion.requireValid(context.pluginVersion)
             val inputs = TreeMap<String, ByteArray>()
             deterministicInputs.forEach { (path, bytes) ->
                 val normalized = path.replace('\\', '/')
@@ -222,12 +223,13 @@ abstract class PublishKaleidoReleaseTask : DefaultTask() {
                 "certificateSha256=" + certificate + "\n"
             val setId = sha256(identity.toByteArray(StandardCharsets.UTF_8))
             val manifest = identity +
-                "pluginVersion=" + context.pluginVersion + "\n" +
+                "pluginVersion=" + pluginVersion + "\n" +
                 "profile=" + adoption["profile"] + "\n" +
                 "publicationResult=PUBLISHED\n" +
                 "releaseEvidenceSetId=" + setId + "\n"
             val report = report(
-                context, adoption, generation, signing, compose, setId,
+                context.copy(pluginVersion = pluginVersion),
+                adoption, generation, signing, compose, setId,
                 unsignedSha, signedSha, certificate, deterministicSha,
                 rawKaleidoSha, rawR8Sha, composedSha, resourceSha,
             )
