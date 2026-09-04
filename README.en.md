@@ -80,7 +80,7 @@ all-device, or store-acceptance validation.
 
 ## Requirements
 
-Kaleido `0.1.0` is developed and tested with:
+Kaleido `0.1.1` is developed and tested with:
 
 | Host | Android Gradle Plugin | Gradle | JDK | Build Tools | compileSdk |
 | --- | --- | --- | --- | --- | --- |
@@ -123,7 +123,7 @@ Apply Kaleido after the Android application plugin in the application module's
 ```kotlin
 plugins {
     id("com.android.application") version "9.2.0"
-    id("io.github.ujffdi.kaleido") version "0.1.0"
+    id("io.github.ujffdi.kaleido") version "0.1.1"
 }
 
 android {
