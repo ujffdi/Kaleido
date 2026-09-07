@@ -11,8 +11,11 @@ diagnostic, or toolchain failures require investigation rather than suppression.
 
 Publishing uses a small Gradle Plugin Portal workflow from a clean `origin/main`
 revision: plugin tests, the public Sample AAB build, `validatePlugins`,
-`publishPlugins --validate-only`, and `publishPlugins`. Performance benchmarks,
-device runs, extra hosts, signed manifests, SBOM generation, and release dossiers
-are optional maintenance work rather than publication blockers. A defective
-public version is documented and followed by a new patch version instead of
-overwriting an existing Portal version.
+`publishPlugins --validate-only`, and `publishPlugins`. The Sample AAB
+validation tree at `docs/public/sample-aab-validation/` is a frozen historical
+snapshot; `publish-portal-release.sh` and `validate-public-docs.sh` must not
+replace it, and a new plugin version does not require a new public evidence
+page. Performance benchmarks, device runs, extra hosts, signed manifests, SBOM
+generation, and release dossiers are optional maintenance work rather than
+publication blockers. A defective public version is documented and followed by
+a new patch version instead of overwriting an existing Portal version.

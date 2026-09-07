@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Validates public documentation and a fresh Sample AAB under
+# build/release-validation/. The Pages snapshot at
+# docs/public/sample-aab-validation/ is immutable and is not refreshed here.
 set -euo pipefail
 
 if [[ $# -ne 1 ]]; then
@@ -7,10 +10,13 @@ if [[ $# -ne 1 ]]; then
 fi
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+# shellcheck source=public-sample-evidence.sh
+source "$(dirname "${BASH_SOURCE[0]}")/public-sample-evidence.sh"
 version="$1"
 work_root="$repo_root/build/release-validation"
 plugin_repository="$repo_root/kaleido-gradle-plugin/build/functional-test-repository"
 mkdir -p "$work_root"
+expected_public_sample_evidence="$(public_sample_evidence_manifest)"
 
 python3 - "$repo_root" <<'PY'
 import pathlib, re, sys
@@ -107,5 +113,6 @@ cp -R "$repo_root/$sample/." "$target/"
   -PsamplePluginRepository="$plugin_repository" \
   -PsampleAgpVersion=9.2.0 -PsampleKaleidoVersion="$version"
 verify_sample_outputs "$target"
+assert_public_sample_evidence_unchanged "$expected_public_sample_evidence"
 
 echo "Kaleido public documentation and Sample AAB validation passed for $version"
